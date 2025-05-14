@@ -1,0 +1,29 @@
+{
+  // "extends": "@tsconfig/node22/tsconfig.json",
+  "compilerOptions": {
+    "allowJs": false,
+    "skipLibCheck": true,
+    "noEmit": true,
+    "isolatedModules": false,
+    "allowImportingTsExtensions": true,
+    "forceConsistentCasingInFileNames": true,
+    "incremental": true,
+    "target": "ES6", // Target modern JavaScript
+    "module": "CommonJS", // Use CommonJS module system
+    "moduleResolution": "node", // Node.js-style module resolution
+    "baseUrl": "./", // Base directory for resolving paths
+    "outDir": "./dist", // Output directory for compiled files
+    "rootDir": "./", // Root directory of source files
+    "esModuleInterop": true, // Allow default imports from CommonJS modules
+    "allowSyntheticDefaultImports": true, // Allow synthetic default imports
+    "strict": true, // Enable strict type-checking options
+    "resolveJsonModule": true, // Allow importing JSON files
+    "sourceMap": true, // Generate source maps for debugging
+    "declaration": true, // Generate `.d.ts` declaration files
+    "experimentalDecorators": true, // Enable experimental decorators
+    "emitDecoratorMetadata": true, // Emit metadata for decorators
+    "typeRoots": ["./api/v1/types", "./node_modules/@types"]
+  },
+  "include": ["**/*.ts", "**/*.d.ts"],
+  "exclude": ["node_modules"]
+}

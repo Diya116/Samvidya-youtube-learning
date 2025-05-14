@@ -2,10 +2,53 @@
   "name": "samvidya",
   "version": "1.0.0",
   "description": "application that provide structured yt learning",
-  "main": "index.js",
+  "main": "main.ts",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "ts-node main.ts",
+    "dev": "nodemon",
+    "deno": "deno run --allow-net --allow-env --allow-read --unstable-sloppy-imports --watch main.ts",
+    "pm2": "pm2 start ts-node -- --project tsconfig.json main.ts",
+    "postinstall": "prisma generate",
+    "format": "prettier --write --ignore-unknown .",
+    "build": "tsx --tsconfig tsconfig.build.json ./main.ts",
+    "coverage": "vitest run --coverage",
+    "type-check": "echo 'Type checking will be done on pre-commit hook'",
+    "lint": "echo 'Elinting will be done on pre-commit hook'",
+    "lint:fix": "eslint --fix .",
+    "format:check": "echo 'Formating will be done on pre-commit hook'",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset -f",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio",
+    "db:seed": "prisma db seed"
+  },
+  "prisma": {
+    "schema": "./src/prisma/schema.prisma"
   },
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "@types/compression": "^1.7.5",
+    "@types/cors": "^2.8.18",
+    "@types/express": "^5.0.1",
+    "@types/helmet": "^0.0.48",
+    "@types/morgan": "^1.9.9",
+    "@types/node": "^22.15.17",
+    "nodemon": "^3.1.10",
+    "prisma": "^6.7.0",
+    "ts-node": "^10.9.2",
+    "tsconfig-paths": "^4.2.0",
+    "typescript": "^5.8.3"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.7.0",
+    "compression": "^1.8.0",
+    "cors": "^2.8.5",
+    "dotenv": "^16.5.0",
+    "express": "^5.1.0",
+    "express-rate-limit": "^7.5.0",
+    "helmet": "^8.1.0",
+    "morgan": "^1.10.0",
+    "winston": "^3.17.0"
+  }
 }
