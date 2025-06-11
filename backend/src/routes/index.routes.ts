@@ -1,8 +1,7 @@
-import express,{Request,Response}from 'express';
-const router=express.Router();
-router.get("/auth",(req:Request,res:Response)=>{
-    res.status(200).json({
-        message:"auth route"
-    });
-});
+import express from "express";
+import courseRoute from "./course.routes"
+import lessonRoute from "./lesson.routes"
+const router = express.Router(); 
+router.use("/course", courseRoute);
+router.use("/lesson", lessonRoute);
 export default router;
