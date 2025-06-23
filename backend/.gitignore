@@ -1,2 +1,19 @@
-node_modules
+# Ignore node modules
+node_modules/
+
+# Ignore environment variables
 .env
+.env.*   # if you use .env.development, .env.production, etc.
+
+# Ignore logs
+logs
+*.log
+npm-debug.log*
+
+# Ignore system files
+.DS_Store
+Thumbs.db
+
+# Ignore build output (optional)
+dist/
+build/
