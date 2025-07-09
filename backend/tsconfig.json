@@ -22,7 +22,8 @@
     "declaration": true, // Generate `.d.ts` declaration files
     "experimentalDecorators": true, // Enable experimental decorators
     "emitDecoratorMetadata": true, // Emit metadata for decorators
-    "typeRoots": ["./api/v1/types", "./node_modules/@types"]
+    "typeRoots": ["./api/v1/types", "./node_modules/@types"],
+       
   },
   "include": ["**/*.ts", "**/*.d.ts"],
   "exclude": ["node_modules"]
