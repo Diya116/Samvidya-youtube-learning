@@ -10,9 +10,9 @@ import helmet from "helmet";
 //allows cross-origin resource sharing 
 import cors from "cors";
 
-import routes from "../src/routes/index.routes.ts";
+import routes from "../src/routes/index.routes";
 import { env } from "./env";
-import logger from "../src/lib/logger.ts";
+import logger from "../src/lib/logger";
 const api = "/api/v1";
 
 export default (app: express.Application) => {
