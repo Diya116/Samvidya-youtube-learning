@@ -1,6 +1,7 @@
+import type { YouTubeVideoDetails } from "@/types/types";
 import { extractVideoId } from "@/utils/extractVideoId";
 import { formatDuration } from "@/utils/formatDuration";
-export const fetchYouTubeDetails = async (url: string): Promise<any> => {
+export const fetchYouTubeDetails = async (url: string): Promise<YouTubeVideoDetails|null> => {
   const YOUTUBE_API_KEY = import.meta.env.VITE_YOUTUBE_API_KEY;
   const videoId = extractVideoId(url);
   if (!videoId) return null;

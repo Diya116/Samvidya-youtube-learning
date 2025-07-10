@@ -13,4 +13,11 @@ export interface Lesson {
     imagePreview: string;
     lessons: Lesson[];
   }
+
+  export interface YouTubeVideoDetails {
+  title: string;
+  description: string;
+  duration: string; // e.g., "10:30"
+}
+
   
