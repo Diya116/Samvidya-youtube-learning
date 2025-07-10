@@ -1,5 +1,10 @@
 {
   "build": {
-    "root": "backend"
+    "builder": "nixpacks",
+    "buildCommand": "cd backend && npm install && npm run build"
+  },
+  "deploy": {
+    "startCommand": "cd backend && npm start",
+    "restartPolicyType": "always"
   }
 }
