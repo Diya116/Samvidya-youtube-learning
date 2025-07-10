@@ -7,7 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {fetchYouTubeDetails} from "@/services/fetchYouTubeDetails"
 import type { Lesson } from '@/types/types';
-
+import type {YouTubeVideoDetails} from '@/types/types'
 export const LessonForm: React.FC<{
   onAddLesson: (lesson: Omit<Lesson, 'id'>) => void;
   onCancel: () => void;
@@ -27,7 +27,7 @@ export const LessonForm: React.FC<{
     
     setIsLoading(true);
     try {
-      const details: any = await fetchYouTubeDetails(lessonData.videoUrl);
+      const details: YouTubeVideoDetails|null = await fetchYouTubeDetails(lessonData.videoUrl);
       if (details) {
         setLessonData(prev => ({
           ...prev,
