@@ -21,9 +21,9 @@ export const env = {
     .map((key) => process.env[key] as string)
     .filter((client) => client && isValidUrl(client)),
 
-//   jwtSecretKey: process.env.JWT_SECRET_KEY!,
-//   accessTokenSecretKey: process.env.ACCESS_TOKEN_SECRET_KEY!,
-//   refreshTokenSecretKey: process.env.REFRESH_TOKEN_SECRET_KEY!,
+  jwtSecretKey: process.env.JWT_SECRET_KEY!,
+  accessTokenSecretKey: process.env.ACCESS_TOKEN_SECRET_KEY!,
+  refreshTokenSecretKey: process.env.REFRESH_TOKEN_SECRET_KEY!,
 
 //   googleClientId: process.env.GOOGLE_CLIENT_ID!,
 //   googleClientSecret: process.env.GOOGLE_CLIENT_SECRET!,

@@ -1,7 +1,7 @@
 import express from "express";
 
-import { env } from "./config/env.ts";
-import config from "./config/server.ts";
+import { env } from "./config/env";
+import config from "./config/server";
 
 const app: express.Application = express();
 
