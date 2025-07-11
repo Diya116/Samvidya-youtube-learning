@@ -2,9 +2,10 @@
   "name": "samvidya",
   "version": "1.0.0",
   "description": "application that provide structured yt learning",
-  "main": "main.ts",
+  "main": "dist/main.js",
   "scripts": {
-    "start": "ts-node main.ts",
+    "start": "node dist/main.js",
+    "start:dev": "ts-node main.ts",
     "dev": "nodemon",
     "deno": "deno run --allow-net --allow-env --allow-read --unstable-sloppy-imports --watch main.ts",
     "pm2": "pm2 start ts-node -- --project tsconfig.json main.ts",

@@ -13,7 +13,7 @@ const isValidUrl = (url: string): boolean => {
 export const env = {
   nodeEnv: process.env.NODE_ENV,
 
-  port: parseInt(process.env.SERVER_PORT || "8080", 10),
+  port: parseInt(process.env.PORT || "8080", 10),
   baseUrl: process.env.SERVER_URL || "http://localhost:8080",
 
   clients: Object.keys(process.env)
