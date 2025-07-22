@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { User, Moon, Sun, Settings, LogOut } from 'lucide-react';
 import {
   DropdownMenu,
@@ -10,26 +10,9 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-
+import { useTheme } from '@/context/ThemeProvider';
 const DashboardHeader: React.FC = () => {
-  const [isDark, setIsDark] = useState(false);
-
-  useEffect(() => {
-    // Check if dark mode is already enabled
-    const darkMode = document.documentElement.classList.contains('dark');
-    setIsDark(darkMode);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    
-    if (newTheme) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
+  const {theme,toggleTheme}=useTheme();
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60">
@@ -51,7 +34,7 @@ const DashboardHeader: React.FC = () => {
             onClick={toggleTheme}
             className="cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
           >
-            {isDark ? (
+            {(theme==="light") ? (
               <Sun className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             ) : (
               <Moon className="h-4 w-4 text-gray-700 dark:text-gray-300" />

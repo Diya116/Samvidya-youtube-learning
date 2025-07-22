@@ -20,4 +20,6 @@ export interface Lesson {
   duration: string; // e.g., "10:30"
 }
 
-  
+  export type FormErrors = {
+    [key: string]: string;
+};

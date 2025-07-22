@@ -10,13 +10,25 @@ import {
 import { Button } from '@/components/ui/button';
 import type { Course } from '@/types/types';
 import {CourseForm} from "./CourseForm"
+import axios from "axios"
 export const AddCourseModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
   
-    const handleCourseSubmit = (course: Course) => {
-      console.log('Course submitted:', course);
-      // Handle course submission here
+    const handleCourseSubmit = async(course: Course) => {
+      try{
+         const response= await axios.post(" http://localhost:5000/api/v1/course",
+       course,{
+        headers:{'Content-Type': 'application/json',
+        Authorization:`Bearer ${localStorage.getItem("token")}`
+        },
+      })
+      console.log('Course submitted:', response);
       setIsOpen(false);
+      }
+      catch(error){
+        console.error('Error submitting course:', error);
+      }
+ 
     };
   
     return (
@@ -30,9 +42,6 @@ export const AddCourseModal: React.FC = () => {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Course</DialogTitle>
-            {/* <DialogDescription>
-              Add course details, upload an image, and create lessons with YouTube videos.
-            </DialogDescription> */}
           </DialogHeader>
           <CourseForm onSubmit={handleCourseSubmit} />
         </DialogContent>

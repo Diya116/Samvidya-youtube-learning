@@ -26,7 +26,7 @@
   "prisma": {
     "schema": "./src/prisma/schema.prisma"
   },
-  "author": "",
+  "author": "Diya Shah",
   "license": "ISC",
   "devDependencies": {
     "@types/bcrypt": "^5.0.2",
@@ -37,14 +37,21 @@
     "@types/jsonwebtoken": "^9.0.10",
     "@types/morgan": "^1.9.9",
     "@types/node": "^22.15.17",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.8",
+    "install": "^0.13.0",
     "nodemon": "^3.1.10",
+    "npm": "^11.4.2",
     "prisma": "^6.7.0",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1",
     "ts-node": "^10.9.2",
     "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.3",
     "typescript": "^5.8.3"
   },
   "dependencies": {
+    "@diyashah/await-timer-intervals": "^1.1.0",
     "@prisma/client": "^6.7.0",
     "axios": "^1.9.0",
     "bcrypt": "^6.0.0",

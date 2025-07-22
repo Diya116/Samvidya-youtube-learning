@@ -1,7 +1,15 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Progress } from '@/components/ui/progress';
-import { Play, Clock, BookOpen } from 'lucide-react';
+import { 
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Play, Clock, BookOpen, ArrowRight, MoreVertical, Edit, Trash2 } from 'lucide-react';
 
 // Types
 interface Course {
@@ -11,157 +19,228 @@ interface Course {
   numberOfLessons: number;
   totalHours: number;
   completedLessons: number;
-  gradient: string;
+  imageUrl?: string;
 }
 
 // Course Card Component
 interface CourseCardProps {
   course: Course;
   onAction: (courseId: string) => void;
+  onEdit: (courseId: string) => void;
+  onDelete: (courseId: string) => void;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction }) => {
+export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit, onDelete }) => {
   const progressPercentage = Math.round((course.completedLessons / course.numberOfLessons) * 100);
   const isStarted = course.completedLessons > 0;
+  const defaultImage = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=240&fit=crop&crop=center";
 
   return (
-    <Card className="group overflow-hidden transition-all duration-300  cursor-pointer border-0 bg-white w-full max-w-sm">
-      {/* Clean Image Header */}
-      <div 
-        className={`relative h-48 bg-cover bg-center ${course.gradient}`}
-        style={{ backgroundImage: "url('https://wallpapercave.com/wp/wp5070716.jpg')" }}
-        onClick={() => onAction(course.id)}
-      >
-        {/* Subtle Overlay for Better Visual Appeal */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent"></div>
-        
-        {/* Progress Badge - Only if started */}
-        {isStarted && (
-          <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm rounded-full px-3 py-1">
-            <span className="text-xs font-medium text-gray-800">{progressPercentage}%</span>
+    <Card 
+      className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer  border-r-2 border-slate-400 bg-gray-100  w-full dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 "
+    >
+      <div className="flex h-32">
+        {/* Image Section - Left Side */}
+        <div 
+          className="relative w-48 flex-shrink-0 bg-cover bg-center overflow-hidden"
+          style={{ 
+            backgroundImage: `url(${course.imageUrl || defaultImage})`,
+            backgroundSize: 'cover',
+            backgroundPosition: 'center'
+          }}
+        >
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-black/30"></div>
+        </div>
+
+        {/* Content Section - Right Side */}
+        <div className="flex-1 p-4 flex flex-col justify-between">
+          {/* Top Section - Title and Description */}
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-1 group-hover transition-colors dark:text-amber-50">
+                {course.title}
+              </h3>
+              <div className="flex items-center space-x-2">
+                <span className={`text-xs px-2 py-1 rounded-md font-mono font-medium border ${
+                  isStarted 
+                    ? 'bg-green-50 text-green-700 border-green-200' 
+                    : 'bg-blue-50 text-blue-700 border-blue-200'
+                }`}>
+                  {isStarted ? 'IN_PROGRESS' : 'READY_TO_START'}
+                </span>
+                
+                {/* More Options Dropdown */}
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <MoreVertical className="h-4 w-4" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-48">
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onEdit(course.id);
+                      }}
+                      className="cursor-pointer"
+                    >
+                      <Edit className="mr-2 h-4 w-4" />
+                      Edit Course
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onDelete(course.id);
+                      }}
+                      className="cursor-pointer text-red-600 focus:text-red-600"
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" />
+                      Delete Course
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+            </div>
+            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed dark:text-gray-300">
+              {course.description}
+            </p>
           </div>
-        )}
 
-        {/* Play Button Overlay */}
-        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-          <button
-            onClick={() => onAction(course.id)}
-            className="w-16 h-16 bg-white/90 backdrop-blur-sm rounded-full shadow-xl flex items-center justify-center hover:bg-white transition-all duration-200"
-          >
-            <Play className="w-6 h-6 text-gray-800 ml-1" fill="currentColor" />
-          </button>
-        </div>
+          {/* Bottom Section - Stats, Progress, and Action */}
+          <div className="space-y-2">
+            {/* Course Stats and Action */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
+                <div className="flex items-center space-x-1">
+                  <BookOpen className="w-4 h-4" />
+                  <span className="font-mono">{course.numberOfLessons}</span>
+                  <span>lessons</span>
+                </div>
+                <div className="flex items-center space-x-1">
+                  <Clock className="w-4 h-4" />
+                  <span className="font-mono">{course.totalHours}h</span>
+                  <span>total</span>
+                </div>
+              </div>
+              
+              <Button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onAction(course.id);
+                }}
+                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+              >
+                <span>{isStarted ? 'Continue' : 'Start'}</span>
+                <ArrowRight className="w-3 h-3" />
+              </Button>
+            </div>
 
-        {/* Decorative Elements */}
-        <div className="absolute top-6 left-6 opacity-20">
-          <div className="w-8 h-8 rounded-full border-2 border-white"></div>
-        </div>
-        <div className="absolute bottom-6 left-6 opacity-15">
-          <div className="w-12 h-12 rounded-full border border-white"></div>
+            {/* Progress Bar - Only if started */}
+            {isStarted && (
+              <div className="flex items-center space-x-2">
+                <span className="text-xs text-gray-500 font-medium dark:text-gray-400">
+                  Progress:
+                </span>
+                <div className="flex items-center space-x-2 flex-1">
+                  <div className="relative flex-1 max-w-24 bg-gray-300 rounded-sm h-1 overflow-hidden dark:bg-gray-700">
+                    <div 
+                      className="h-full bg-gray-900 transition-all duration-300 ease-out"
+                      style={{ width: `${progressPercentage}%` }}
+                    ></div>
+                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
+                  </div>
+                  <span className="text-xs text-gray-600 font-mono tabular-nums dark:text-gray-300">
+                    {course.completedLessons}/{course.numberOfLessons}
+                  </span>
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </div>
-
-      <CardContent className="p-6 space-y-4">
-        {/* Course Title and Description */}
-        <div className="space-y-2">
-          <h3 className="text-xl font-bold text-gray-900 leading-tight line-clamp-2">
-            {course.title}
-          </h3>
-          <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed">
-            {course.description}
-          </p>
-        </div>
-
-        {/* Course Stats */}
-        <div className="flex items-center justify-between py-2">
-          <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-1 text-gray-500">
-              <BookOpen className="w-4 h-4" />
-              <span className="text-sm font-medium">{course.numberOfLessons} lessons</span>
-            </div>
-            <div className="flex items-center space-x-1 text-gray-500">
-              <Clock className="w-4 h-4" />
-              <span className="text-sm font-medium">{course.totalHours}h</span>
-            </div>
-          </div>
-          
-          {/* Action Button */}
-          <button
-            onClick={() => onAction(course.id)}
-            className="px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-colors duration-200 flex items-center space-x-2"
-          >
-            <Play className="w-3 h-3" fill="currentColor" />
-            <span>{isStarted ? 'Continue' : 'Start'}</span>
-          </button>
-        </div>
-
-        {/* Progress Section */}
-        {isStarted && (
-          <div className="space-y-2 pt-2 border-t border-gray-100">
-            <div className="flex items-center justify-between">
-              <span className="text-sm text-gray-600">Progress</span>
-              <span className="text-sm font-medium text-gray-900">
-                {course.completedLessons}/{course.numberOfLessons} completed
-              </span>
-            </div>
-            <Progress value={progressPercentage} className="h-2" />
-          </div>
-        )}
-      </CardContent>
     </Card>
   );
 };
 
 // Demo Component
-export default function CourseCardDemo() {
+const CourseCardDemo = () => {
   const sampleCourses: Course[] = [
     {
       id: '1',
-      title: 'Advanced React Development',
-      description: 'Master modern React patterns, hooks, and state management with real-world projects and best practices.',
+      title: 'Advanced React Patterns & Performance',
+      description: 'Master advanced React concepts, hooks, and performance optimization techniques.',
       numberOfLessons: 24,
-      totalHours: 12,
-      completedLessons: 8,
-      gradient: 'bg-gradient-to-br from-blue-500 to-purple-600'
+      totalHours: 8,
+      completedLessons: 12,
+      imageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=240&fit=crop&crop=center'
     },
     {
       id: '2',
-      title: 'UI/UX Design Fundamentals',
-      description: 'Learn the principles of great design, user research, prototyping, and creating beautiful interfaces.',
+      title: 'JavaScript Fundamentals',
+      description: 'Learn core JavaScript concepts from basics to advanced topics.',
       numberOfLessons: 18,
-      totalHours: 9,
+      totalHours: 6,
       completedLessons: 0,
-      gradient: 'bg-gradient-to-br from-pink-500 to-orange-500'
+      imageUrl: 'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400&h=240&fit=crop&crop=center'
     },
     {
       id: '3',
-      title: 'Full-Stack JavaScript',
-      description: 'Build complete web applications using Node.js, Express, MongoDB, and modern frontend frameworks.',
+      title: 'Node.js Backend Development',
+      description: 'Build scalable backend applications with Node.js and Express.',
       numberOfLessons: 32,
-      totalHours: 20,
-      completedLessons: 15,
-      gradient: 'bg-gradient-to-br from-green-500 to-teal-600'
+      totalHours: 12,
+      completedLessons: 8
+      // No imageUrl - will use default
     }
   ];
 
-  const handleAction = (courseId: string) => {
-    console.log('Course action:', courseId);
+  const handleCourseAction = (courseId: string) => {
+    console.log(`Opening course: ${courseId}`);
+  };
+
+  const handleEditCourse = (courseId: string) => {
+    console.log(`Editing course: ${courseId}`);
+    // Here you would typically open an edit modal or navigate to edit page
+  };
+
+  const handleDeleteCourse = (courseId: string) => {
+    console.log(`Deleting course: ${courseId}`);
+    // Here you would typically show a confirmation dialog
+    if (window.confirm('Are you sure you want to delete this course?')) {
+      // Perform deletion
+      console.log(`Course ${courseId} deleted`);
+    }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 p-8">
-      <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Course Library</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div className="min-h-screen bg-gray-50 p-8 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60">
+      <div className="max-w-4xl mx-auto">
+        <div className="text-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">Your courses</h1>
+          <p className="text-gray-600 dark:text-white">Continue where you left off or start something new</p>
+        </div>
+        
+        <div className="grid grid-cols-1 gap-4">
           {sampleCourses.map((course) => (
             <CourseCard 
               key={course.id} 
               course={course} 
-              onAction={handleAction} 
+              onAction={handleCourseAction}
+              onEdit={handleEditCourse}
+              onDelete={handleDeleteCourse}
             />
           ))}
         </div>
       </div>
     </div>
   );
-}
+};
+
+export default CourseCardDemo;

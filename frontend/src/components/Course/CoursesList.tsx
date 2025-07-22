@@ -1,96 +1,166 @@
-import React from 'react';
-import {CourseCard} from "../Course/CourseCard"
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  numberOfLessons: number;
-  totalHours: number;
-  completedLessons: number;
-  gradient: string;
-}
-const CourseList: React.FC = () => {
-  // Dummy data with your structure
-  const courses: Course[] = [
+import React, { useState } from 'react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+
+const CourseList = () => {
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDark, setIsDark] = useState(false);
+
+  const courses = [
     {
-      id: '1',
-      title: 'Complete React Development Course',
-      description: 'Master React.js from scratch with hands-on projects, hooks, context API, and modern development practices for building scalable applications.',
-      numberOfLessons: 45,
-      totalHours: 12.5,
-      completedLessons: 8,
-      gradient: 'bg-gradient-to-br from-blue-500 via-purple-500 to-indigo-600'
+      name: "JavaScript Fundamentals",
+      thumbnail: "https://img.youtube.com/vi/PkZNo7MFNFg/mqdefault.jpg",
+      progress: 75,
+      borderColor: "border-slate-300"
     },
     {
-      id: '2',
-      title: 'JavaScript Fundamentals: ES6+ Modern JavaScript',
-      description: 'Learn modern JavaScript features including arrow functions, destructuring, async/await, promises, and advanced programming concepts.',
-      numberOfLessons: 28,
-      totalHours: 8.2,
-      completedLessons: 0,
-      gradient: 'bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600'
+      name: "React Development",
+      thumbnail: "https://img.youtube.com/vi/Ke90Tje7VS0/mqdefault.jpg",
+      progress: 40,
+      borderColor: "border-zinc-300"
     },
     {
-      id: '3',
-      title: 'Node.js & Express.js Backend Development',
-      description: 'Build robust backend applications with Node.js, Express.js, MongoDB, authentication, and RESTful API development.',
-      numberOfLessons: 32,
-      totalHours: 10.8,
-      completedLessons: 15,
-      gradient: 'bg-gradient-to-br from-orange-400 via-pink-400 to-red-500'
+      name: "UI/UX Design",
+      thumbnail: "https://img.youtube.com/vi/c9Wg6Cb_YlU/mqdefault.jpg",
+      progress: 60,
+      borderColor: "border-stone-300"
     },
     {
-      id: '4',
-      title: 'TypeScript for JavaScript Developers',
-      description: 'Add type safety to your JavaScript projects with TypeScript fundamentals, interfaces, generics, and advanced features.',
-      numberOfLessons: 24,
-      totalHours: 7.1,
-      completedLessons: 3,
-      gradient: 'bg-gradient-to-br from-violet-500 via-purple-500 to-pink-500'
+      name: "Database Management",
+      thumbnail: "https://img.youtube.com/vi/HXV3zeQKqGY/mqdefault.jpg",
+      progress: 85,
+      borderColor: "border-gray-300"
     },
     {
-      id: '5',
-      title: 'CSS Grid & Flexbox - Modern Layouts',
-      description: 'Master modern CSS layout techniques with Grid and Flexbox for creating responsive, professional web designs.',
-      numberOfLessons: 18,
-      totalHours: 5.3,
-      completedLessons: 18,
-      gradient: 'bg-gradient-to-br from-green-500 via-emerald-500 to-teal-600'
+      name: "Machine Learning",
+      thumbnail: "https://img.youtube.com/vi/aircAruvnKk/mqdefault.jpg",
+      progress: 25,
+      borderColor: "border-neutral-300"
     },
     {
-      id: '6',
-      title: 'MongoDB Database Design & Operations',
-      description: 'Learn MongoDB database design, queries, indexing, aggregation pipelines, and performance optimization techniques.',
-      numberOfLessons: 22,
-      totalHours: 6.5,
-      completedLessons: 0,
-      gradient: 'bg-gradient-to-br from-amber-500 via-orange-500 to-red-500'
+      name: "Cybersecurity",
+      thumbnail: "https://img.youtube.com/vi/z5nc9MDbvkw/mqdefault.jpg",
+      progress: 90,
+      borderColor: "border-slate-400"
     }
   ];
 
-  const handleCourseAction = (courseId: string) => {
-    const course = courses.find(c => c.id === courseId);
-    const isStarted = course && course.completedLessons > 0;
-    console.log(`${isStarted ? 'Resuming' : 'Starting'} course: ${course?.title}`);
-    // Handle course action logic here
+  const nextCourse = () => {
+    setCurrentIndex((prev) => (prev + 1) % courses.length);
   };
 
-return (
-  <div className="max-w-7xl mx-auto min-h-screen flex justify-center items-center">
-    {/* Course Centered Grid */}
-    <div className="flex justify-center items-center gap-6 flex-wrap">
-      {courses.map((course) => (
-        <div key={course.id} className="flex-shrink-0 w-80">
-          <CourseCard 
-            course={course} 
-            onAction={handleCourseAction}
-          />
-        </div>
-      ))}
-    </div>
-  </div>
-);
+  const prevCourse = () => {
+    setCurrentIndex((prev) => (prev - 1 + courses.length) % courses.length);
+  };
 
+  const visibleCourses = 5;
+  const displayedCourses = [];
+  
+  for (let i = 0; i < visibleCourses; i++) {
+    const index = (currentIndex + i) % courses.length;
+    displayedCourses.push(courses[index]);
+  }
+
+  return (
+    <div className={`${isDark ? 'bg-gray-900' : 'bg-white'} rounded-xl p-4 transition-all duration-300`}>
+      {/* Header */}
+      {/* <div className="flex items-center justify-between mb-4">
+        <h2 className={`text-lg font-semibold ${isDark ? 'text-white' : 'text-gray-900'}`}>
+          Continue Learning
+        </h2>
+        <div className="flex items-center space-x-2">
+          <button
+            onClick={prevCourse}
+            className={`p-1 rounded-lg transition-colors ${
+              isDark 
+                ? 'hover:bg-gray-800 text-gray-400' 
+                : 'hover:bg-gray-100 text-gray-600'
+            }`}
+          >
+            <ChevronLeft className="w-4 h-4" />
+          </button>
+          <button
+            onClick={nextCourse}
+            className={`p-1 rounded-lg transition-colors ${
+              isDark 
+                ? 'hover:bg-gray-800 text-gray-400' 
+                : 'hover:bg-gray-100 text-gray-600'
+            }`}
+          >
+            <ChevronRight className="w-4 h-4" />
+          </button>
+        </div>
+      </div> */}
+
+      {/* Course Cards */}
+      <div className="flex gap-3 overflow-hidden justify-center ">
+        {displayedCourses.map((course, index) => (
+          <div
+            key={`${course.name}-${index}`}
+            className={`
+              flex-shrink-0 w-48 h-24 rounded-lg border-2 p-3 cursor-pointer transition-all duration-300 hover:scale-105
+              ${course.borderColor}
+              ${isDark 
+                ? 'bg-gray-800 hover:bg-gray-700' 
+                : 'bg-gray-50 hover:bg-gray-100'
+              }
+            `}
+          >
+            <div className="flex items-start gap-3 h-full">
+              {/* Thumbnail */}
+              <img 
+                src={course.thumbnail} 
+                alt={course.name}
+                className="w-12 h-8 object-cover rounded-md flex-shrink-0"
+              />
+              
+              {/* Content */}
+              <div className="flex-1 min-w-0">
+                {/* Title */}
+                <h3 className={`text-xs font-medium mb-2 line-clamp-2 leading-tight ${
+                  isDark ? 'text-white' : 'text-gray-900'
+                }`}>
+                  {course.name}
+                </h3>
+                
+                {/* Progress Bar */}
+                <div className="space-y-1">
+                  <div className="flex justify-between items-center">
+                    <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {course.progress}%
+                    </span>
+                    <ChevronRight className={`w-3 h-3 ${isDark ? 'text-gray-400' : 'text-gray-500'}`} />
+                  </div>
+                  <div className={`w-full h-1 rounded-full ${isDark ? 'bg-gray-700' : 'bg-gray-200'}`}>
+                    <div
+                      className={`h-1 rounded-full transition-all duration-500 ${
+                        isDark ? 'bg-white' : 'bg-black'
+                      }`}
+                      style={{ width: `${course.progress}%` }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        ))}
+      </div>
+
+      {/* Navigation Dots */}
+      <div className="flex justify-center mt-4 gap-1">
+        {courses.map((_, index) => (
+          <button
+            key={index}
+            onClick={() => setCurrentIndex(index)}
+            className={`w-1.5 h-1.5 rounded-full transition-all duration-300 ${
+              index === currentIndex 
+                ? (isDark ? 'bg-white' : 'bg-black')
+                : (isDark ? 'bg-gray-700' : 'bg-gray-300')
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  );
 };
 
-export default CourseList
+export default CourseList;
