@@ -39,9 +39,7 @@ export const signupUserapi=async({name,email,password}:SignupForm)=>{
 
 export const logoutUserapi=async()=>{
     try{
-        const response=await api.post(`${BACKEND_BASE_URL}/auth/logout`,{},{
-            withCredentials:true
-        });
+        const response=await api.delete(`${BACKEND_BASE_URL}/auth/logout`);
         localStorage.removeItem("token");
         return {success:true,data:response.data}
     }

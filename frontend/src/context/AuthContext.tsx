@@ -12,7 +12,7 @@ type User={
 
 type AuthContextType = {
     user:User |null;
-    isAuthenticated:boolean;
+    isAuthenticated:() => boolean;
     token:string | null;
     login: (formData: LoginFormType) => Promise<void>;
     signup:(formData:SignupForm)=> Promise<void>;
@@ -29,7 +29,7 @@ export const AuthProvider=({children}:{children:ReactNode})=>{
     const storedUser = localStorage.getItem("user");
 
     if (storedToken) setToken(storedToken);
-    if (storedUser) setUser(storedUser);
+    if (storedUser) setUser(JSON.parse(storedUser) as User);
   }, []);
     const login=useCallback(async(form:LoginFormType)=>{
         const res=await loginUserapi(form);
@@ -69,6 +69,7 @@ export const AuthProvider=({children}:{children:ReactNode})=>{
             localStorage.removeItem("user");
             setToken(null);
             setUser(null);
+            window.location.href = '/auth/login'; // Redirect to login page after logout
         }
         else{
             console.error("Logout failed:", res.error);

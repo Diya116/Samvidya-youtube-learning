@@ -18,7 +18,7 @@ import { CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 
-const SignupForm = () => {
+const Signup= () => {
   const navigate = useNavigate();
   const {signup}=useAuth();
   const [formData, setFormData] = useState<SignupForm>({
@@ -46,7 +46,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (): Promise<void> => {
     //1)email and password both required
     if(formData.name.trim() === "" ||formData.email.trim() === "" || formData.password.trim() === "") {
       setError("name,Email,password both required" );  
@@ -77,7 +77,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
-      handleSubmit(e);
+      handleSubmit();
     }
   };
   return (
@@ -166,4 +166,4 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   );
 };
 
-export default SignupForm;
+export default Signup;

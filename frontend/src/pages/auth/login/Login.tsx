@@ -45,7 +45,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (): Promise<void> => {
     //1)email and password both required
     if(formData.email.trim() === "" || formData.password.trim() === "") {
       setError("Email and password both required" );  
@@ -76,7 +76,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === 'Enter') {
-      handleSubmit(e);
+      handleSubmit();
     }
   };
   return (

@@ -1,6 +1,5 @@
 import React from 'react';
-import { Card, CardContent } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
+import { Card } from '@/components/ui/card'
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,7 +8,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
-import { Play, Clock, BookOpen, ArrowRight, MoreVertical, Edit, Trash2 } from 'lucide-react';
+import {  Clock, BookOpen, ArrowRight, MoreVertical, Edit, Trash2 } from 'lucide-react';
 
 // Types
 interface Course {
@@ -20,6 +19,7 @@ interface Course {
   totalHours: number;
   completedLessons: number;
   imageUrl?: string;
+  coverImg?: string; // Optional cover image URL
 }
 
 // Course Card Component
@@ -44,7 +44,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit
         <div 
           className="relative w-48 flex-shrink-0 bg-cover bg-center overflow-hidden"
           style={{ 
-            backgroundImage: `url(${course.imageUrl || defaultImage})`,
+            backgroundImage: `url(${course.coverImg || defaultImage})`,
             backgroundSize: 'cover',
             backgroundPosition: 'center'
           }}
@@ -169,78 +169,3 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit
   );
 };
 
-// Demo Component
-const CourseCardDemo = () => {
-  const sampleCourses: Course[] = [
-    {
-      id: '1',
-      title: 'Advanced React Patterns & Performance',
-      description: 'Master advanced React concepts, hooks, and performance optimization techniques.',
-      numberOfLessons: 24,
-      totalHours: 8,
-      completedLessons: 12,
-      imageUrl: 'https://images.unsplash.com/photo-1633356122544-f134324a6cee?w=400&h=240&fit=crop&crop=center'
-    },
-    {
-      id: '2',
-      title: 'JavaScript Fundamentals',
-      description: 'Learn core JavaScript concepts from basics to advanced topics.',
-      numberOfLessons: 18,
-      totalHours: 6,
-      completedLessons: 0,
-      imageUrl: 'https://images.unsplash.com/photo-1579468118864-1b9ea3c0db4a?w=400&h=240&fit=crop&crop=center'
-    },
-    {
-      id: '3',
-      title: 'Node.js Backend Development',
-      description: 'Build scalable backend applications with Node.js and Express.',
-      numberOfLessons: 32,
-      totalHours: 12,
-      completedLessons: 8
-      // No imageUrl - will use default
-    }
-  ];
-
-  const handleCourseAction = (courseId: string) => {
-    console.log(`Opening course: ${courseId}`);
-  };
-
-  const handleEditCourse = (courseId: string) => {
-    console.log(`Editing course: ${courseId}`);
-    // Here you would typically open an edit modal or navigate to edit page
-  };
-
-  const handleDeleteCourse = (courseId: string) => {
-    console.log(`Deleting course: ${courseId}`);
-    // Here you would typically show a confirmation dialog
-    if (window.confirm('Are you sure you want to delete this course?')) {
-      // Perform deletion
-      console.log(`Course ${courseId} deleted`);
-    }
-  };
-
-  return (
-    <div className="min-h-screen bg-gray-50 p-8 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60">
-      <div className="max-w-4xl mx-auto">
-        <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 dark:text-white">Your courses</h1>
-          <p className="text-gray-600 dark:text-white">Continue where you left off or start something new</p>
-        </div>
-        
-        <div className="grid grid-cols-1 gap-4">
-          {sampleCourses.map((course) => (
-            <CourseCard 
-              key={course.id} 
-              course={course} 
-              onAction={handleCourseAction}
-              onEdit={handleEditCourse}
-              onDelete={handleDeleteCourse}
-            />
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default CourseCardDemo;

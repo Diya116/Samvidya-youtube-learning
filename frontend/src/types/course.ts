@@ -10,8 +10,6 @@ export interface Lesson {
     title: string;
     description: string;
     coverImg: string;
-    image: File | null;
-    imagePreview: string;
     lessons: Lesson[];
   }
 

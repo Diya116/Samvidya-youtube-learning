@@ -24,7 +24,7 @@ api.interceptors.response.use(
         if(error.response.status===401)
         {
             console.error("Unauthorized request, redirecting to login");
-            window.location.href="/login"; // Redirect to login page
+            window.location.href="/auth/login"; // Redirect to login page
         }
         return Promise.reject(error);
     }
