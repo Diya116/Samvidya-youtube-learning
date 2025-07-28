@@ -40,6 +40,8 @@ router.get('/:id', getLesson);
  *             properties:
  *               title:
  *                 type: string
+ *           description: Title of the lesson
+ * 
  *     responses:
  *       201:
  *         description: Lesson created

@@ -19,8 +19,8 @@ model Course {
   description String?
   coverImg    String?
   userId      Int
-  user        User     @relation(fields: [userId], references: [id])
   lessons     Lesson[]
+  user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -35,6 +35,7 @@ model Lesson {
   courseId    String
   course      Course   @relation(fields: [courseId], references: [id])
   notes       Note[]
+  UserLessonProgress UserLessonProgress
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -45,3 +46,26 @@ model Note {
   lesson   Lesson  @relation(fields: [lessonId], references: [id])
 }
 
+model UserCourseProgress {
+  id            String   @id @default(cuid())
+  userId        Int
+  courseId      String
+  completedLessons Int     @default(0)
+  status        CourseStatus @default(NOT_STARTED)
+  updatedAt     DateTime @updatedAt
+  createdAt     DateTime @default(now())
+  course        Course?   @relation(fields: [courseId], references: [id])
+}
+enum CourseStatus {
+  NOT_STARTED
+  IN_PROGRESS
+  COMPLETED
+}
+model UserLessonProgress {
+  id         String   @id @default(cuid())
+  userId     Int
+  lessonId   String
+  completed  Boolean  @default(false)
+  completedAt DateTime?
+  lesson     Lesson   @relation(fields: [lessonId], references: [id])
+}
