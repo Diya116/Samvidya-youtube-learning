@@ -1,22 +1,6 @@
-dowloded dependencies
-1) Husky:
-for managing git hooks in project:
-git-hooks: scripts that executes before or after certain events such as pre-commit,pre-push etc
--used to easily work with cross team 
--git hooks are events that run automatically whern certain git events occure
-run linters,test,format code
-2) @types/node:
-provide typescript type definition for nodejs
+#  Samvidya – Structure Your YouTube Learning
 
-3) ESLint (Code Linting Setup)
-core linting engine that check your code for syntax error ,bad patterns or inconsistent styles
+**Samvidya** is a powerful self-learning tool that provides a **structured and distraction-free way to learn using the world’s biggest free learning source — YouTube**. Whether you're a student, self-learner, or lifelong knowledge seeker, Samvidya lets you create your own course paths, take notes while watching videos, and stay consistent with daily learning goals, Pomodoro sessions, and progress tracking — all in one focused environment.
 
-4) @typescript-eslint/parser
-let eslint understand ts syntax
 
-5) @typescript-eslint/eslint-plugin
-plugin with rules specific to typescript
 
-6) prettier
-an opinionated code formatter
-(eslint is for code quality and prettier for code formatter)
