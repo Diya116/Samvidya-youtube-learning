@@ -107,7 +107,7 @@ class AuthService{
       const refreshToken: string = authTokenService.generateRefreshToken(user as UserPayloadPrivate);
       return res.status(200).setHeader("Authorization",`Bearer ${accessToken}`)
       .cookie("refreshToken",refreshToken,this.refreshTokenCookieOptions)
-      .json({message:"logged in successfully"})
+      .json({message:"logged in successfully",user:user as UserPayloadPublic})
        }
        catch(err){
        console.log(err)

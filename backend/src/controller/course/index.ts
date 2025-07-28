@@ -1,16 +1,19 @@
-import { Request, Response, RequestHandler,NextFunction } from "express";
-import prisma from "../../lib/db"; 
+import { Request, Response, RequestHandler, NextFunction } from "express";
+import prisma from "../../lib/db";
 import { courseSchema } from "./schema";
-export const getCourse: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+export const getCourse: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
 
     const course = await prisma.course.findFirst({
       where: { id },
-      include:{
-        lessons:true,
-        user:true
-      }
+      include: {
+        lessons: true,
+        user: true,
+      },
     });
 
     if (!course) {
@@ -25,27 +28,30 @@ export const getCourse: RequestHandler = async (req: Request, res: Response): Pr
   }
 };
 
-
-
-export const getAllCourses:RequestHandler=async(req:Request,res:Response)=>{
-  try{
- const courses=await prisma.course.findMany({
-include:{
-  lessons:true,
-  user:true
-}
- });
- res.status(200).json(courses)
+export const getAllCourses: RequestHandler = async (
+  req: Request,
+  res: Response
+) => {
+  const authReq = req as AuthenticatedRequest;
+  const userId = authReq.user?.id;
+  try {
+    const courses = await prisma.course.findMany({
+      include: {
+        lessons: true,
+        user: true,
+      },
+      where: {
+        userId: userId,
+      },
+    });
+    res.status(200).json(courses);
+  } catch (error) {
+    console.error("Error fetching courses:", error);
+    res.status(500).json({
+      error: "Internal Server Error",
+    });
   }
-catch(error)
-{
-console.error("Error fetching courses:",error);
-res.status(500).json({
-  error:"Internal Server Error"
-})
-}
-
-}
+};
 interface AuthenticatedRequest extends Request {
   user: {
     id: number;
@@ -54,10 +60,14 @@ interface AuthenticatedRequest extends Request {
     [key: string]: any;
   };
 }
-export const postCourse = async (req: Request, res: Response, next: NextFunction): Promise<void>  => {
+export const postCourse = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): Promise<void> => {
   try {
-    const authReq= req as AuthenticatedRequest;
-    const userId = authReq.user?.id // Assuming user ID is set by auth middleware
+    const authReq = req as AuthenticatedRequest;
+    const userId = authReq.user?.id; // Assuming user ID is set by auth middleware
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorised access: user Id not found" });
@@ -70,15 +80,18 @@ export const postCourse = async (req: Request, res: Response, next: NextFunction
       res.status(400).json({ error: "User does not exist" });
       return;
     }
+    console.log(req.body);
 
     const validateData = courseSchema.safeParse(req.body);
     if (!validateData.success) {
       res.status(400).json({ error: validateData.error.errors });
       return;
     }
+    // console.log("hello")
+    // console.log(req.body)
 
     const { title, description, coverImg } = validateData.data;
-    const {lessons} = req.body;
+    const { lessons } = req.body;
     const course = await prisma.course.create({
       data: {
         title,
@@ -107,7 +120,10 @@ export const postCourse = async (req: Request, res: Response, next: NextFunction
   }
 };
 
-export const updateCourse: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+export const updateCourse: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = 1;
@@ -147,7 +163,7 @@ export const updateCourse: RequestHandler = async (req: Request, res: Response):
       data: {
         title,
         description,
-        coverImg
+        coverImg,
       },
     });
 
@@ -161,7 +177,10 @@ export const updateCourse: RequestHandler = async (req: Request, res: Response):
   }
 };
 
-export const deleteCourse: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+export const deleteCourse: RequestHandler = async (
+  req: Request,
+  res: Response
+): Promise<void> => {
   try {
     const { id } = req.params;
     const userId = 1;
@@ -200,5 +219,3 @@ export const deleteCourse: RequestHandler = async (req: Request, res: Response):
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
-
-

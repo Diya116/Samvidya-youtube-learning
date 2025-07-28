@@ -10,7 +10,7 @@ export function setupSwagger(app: Application) {
         title: 'Test API',
         version: '1.0.0',
       },
-      servers: [{ url: 'http://localhost:3000' }],
+      servers: [{ url: 'http://localhost:3000/api/v1' }],
     },
     apis: ['./src/routes/*.ts'], // Update path if needed
   };
