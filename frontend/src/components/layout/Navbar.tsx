@@ -1,44 +1,32 @@
-import React, { useState, useEffect } from 'react';
-import { User, Moon, Sun, Settings, LogOut } from 'lucide-react';
+import React from 'react';
+import { useNavigate } from 'react-router-dom';
+
+import { useTheme } from '@/context/ThemeProvider';
+import { useAuth } from '@/context/AuthContext';
+
+import { User, Moon, Sun,LogOut } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const DashboardHeader: React.FC = () => {
-  const [isDark, setIsDark] = useState(false);
 
-  useEffect(() => {
-    // Check if dark mode is already enabled
-    const darkMode = document.documentElement.classList.contains('dark');
-    setIsDark(darkMode);
-  }, []);
-
-  const toggleTheme = () => {
-    const newTheme = !isDark;
-    setIsDark(newTheme);
-    
-    if (newTheme) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
+const navigator = useNavigate();
+const {theme,toggleTheme}=useTheme();
+const {  logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-white/95 backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60">
-      <div className="container flex h-16 items-center justify-between px-6">
+    <header className="sticky top-0 z-50 w-full border-b  backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 display flex justify-center">
+      <div className="  container flex h-16 items-center justify-between px-6">
         {/* Logo Section */}
         <div className="flex items-center">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
             <span className="text-black dark:text-white">Samvidya</span>
-            {/* <span className="text-gray-600 dark:text-gray-300">vidya</span> */}
           </h1>
         </div>
 
@@ -51,7 +39,7 @@ const DashboardHeader: React.FC = () => {
             onClick={toggleTheme}
             className="cursor-pointer transition-colors hover:bg-gray-100 dark:hover:bg-gray-800"
           >
-            {isDark ? (
+            {(theme==="light") ? (
               <Sun className="h-4 w-4 text-gray-700 dark:text-gray-300" />
             ) : (
               <Moon className="h-4 w-4 text-gray-700 dark:text-gray-300" />
@@ -71,25 +59,11 @@ const DashboardHeader: React.FC = () => {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-56" align="end" forceMount>
-              <DropdownMenuLabel className="font-normal">
-                <div className="flex flex-col space-y-1">
-                  <p className="text-sm font-medium leading-none">John Doe</p>
-                  <p className="text-xs leading-none text-muted-foreground">
-                    john.doe@example.com
-                  </p>
-                </div>
-              </DropdownMenuLabel>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer">
+              <DropdownMenuItem className="cursor-pointer" onClick={() => navigator("/profile")}>
                 <User className="mr-2 h-4 w-4" />
                 <span>Profile</span>
               </DropdownMenuItem>
-              <DropdownMenuItem className="cursor-pointer">
-                <Settings className="mr-2 h-4 w-4" />
-                <span>Settings</span>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
+              <DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600" onClick={() => confirm("Are you sure you want to log out?") && logout()}>
                 <LogOut className="mr-2 h-4 w-4" />
                 <span>Log out</span>
               </DropdownMenuItem>

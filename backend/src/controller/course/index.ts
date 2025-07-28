@@ -1,4 +1,4 @@
-import { Request, Response, RequestHandler } from "express";
+import { Request, Response, RequestHandler,NextFunction } from "express";
 import prisma from "../../lib/db"; 
 import { courseSchema } from "./schema";
 export const getCourse: RequestHandler = async (req: Request, res: Response): Promise<void> => {
@@ -9,7 +9,7 @@ export const getCourse: RequestHandler = async (req: Request, res: Response): Pr
       where: { id },
       include:{
         lessons:true,
-        User:true
+        user:true
       }
     });
 
@@ -32,7 +32,7 @@ export const getAllCourses:RequestHandler=async(req:Request,res:Response)=>{
  const courses=await prisma.course.findMany({
 include:{
   lessons:true,
-  User:true
+  user:true
 }
  });
  res.status(200).json(courses)
@@ -46,9 +46,18 @@ res.status(500).json({
 }
 
 }
-export const postCourse: RequestHandler = async (req: Request, res: Response): Promise<void> => {
+interface AuthenticatedRequest extends Request {
+  user: {
+    id: number;
+    name?: string;
+    email?: string;
+    [key: string]: any;
+  };
+}
+export const postCourse = async (req: Request, res: Response, next: NextFunction): Promise<void>  => {
   try {
-    const userId = 1;
+    const authReq= req as AuthenticatedRequest;
+    const userId = authReq.user?.id // Assuming user ID is set by auth middleware
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorised access: user Id not found" });
@@ -69,13 +78,21 @@ export const postCourse: RequestHandler = async (req: Request, res: Response): P
     }
 
     const { title, description, coverImg } = validateData.data;
-
+    const {lessons} = req.body;
     const course = await prisma.course.create({
       data: {
         title,
         description,
         coverImg,
-        userId
+        userId,
+        lessons: {
+          create: lessons.map((lesson: any) => ({
+            title: lesson.title,
+            description: lesson.description,
+            url: lesson.videoUrl,
+            duration: lesson.duration,
+          })),
+        },
       },
     });
 
@@ -86,6 +103,7 @@ export const postCourse: RequestHandler = async (req: Request, res: Response): P
   } catch (error) {
     console.error("Error while creating course:", error);
     res.status(500).json({ error: "Internal Server Error" });
+    return;
   }
 };
 

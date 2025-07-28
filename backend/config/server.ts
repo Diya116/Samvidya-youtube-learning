@@ -9,7 +9,7 @@ import morgan from "morgan";
 import helmet from "helmet";
 //allows cross-origin resource sharing 
 import cors from "cors";
-
+import {setupSwagger} from "../swagger"
 import routes from "../src/routes/index.routes";
 import { env } from "./env";
 import logger from "../src/lib/logger";
@@ -26,7 +26,6 @@ export default (app: express.Application) => {
 //handle rejected promises aren't handled yet
 
   app.enable("trust proxy");
-
   app.use(
     cors({
       allowedHeaders: ["Content-Type", "Authorization"], // Allowed headers
@@ -88,7 +87,7 @@ export default (app: express.Application) => {
   app.disable("x-powered-by");
   // app.disable("etag");
   app.use(api, routes);
-
+setupSwagger(app)
   app.get("/", (_req: Request, res: Response) => {
     res.status(200).json({
       message: "samvidya : a platform for structured you tube learning",

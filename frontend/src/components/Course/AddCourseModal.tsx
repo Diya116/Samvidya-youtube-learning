@@ -10,19 +10,29 @@ import {
 import { Button } from '@/components/ui/button';
 import type { Course } from '@/types/types';
 import {CourseForm} from "./CourseForm"
+import {addCourseApi} from '@/services/courseService';
+import { toast } from 'sonner';
 export const AddCourseModal: React.FC = () => {
     const [isOpen, setIsOpen] = useState(false);
-  
-    const handleCourseSubmit = (course: Course) => {
-      console.log('Course submitted:', course);
-      // Handle course submission here
+    const handleCourseSubmit = async(course: Course) => {
+      try{
+      const response= await addCourseApi(course);
+      console.log('Course submitted:', response);
+      toast.success("course created successfully")
       setIsOpen(false);
+      window.location.reload();
+      }
+
+      catch(error){
+        console.error('Error submitting course:', error);
+      }
+ 
     };
   
     return (
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger asChild>
-          <Button>
+          <Button className='cursor-pointer'>
             <Plus className="w-4 h-4 mr-2" />
             Add Course
           </Button>
@@ -30,9 +40,6 @@ export const AddCourseModal: React.FC = () => {
         <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>Create New Course</DialogTitle>
-            {/* <DialogDescription>
-              Add course details, upload an image, and create lessons with YouTube videos.
-            </DialogDescription> */}
           </DialogHeader>
           <CourseForm onSubmit={handleCourseSubmit} />
         </DialogContent>

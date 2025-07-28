@@ -1,22 +1,28 @@
 import { BrowserRouter,Routes,Route } from 'react-router-dom'
-import Dashboard  from "./pages/Dashboard/Dashboard";
-import Signup from './pages/Signup/Signup';
-import Login from './pages/Login/Login';
-import Profile from './pages/Profile/Profile';
-import Home from './pages/Home/Home';
-// import { Suspense,lazy } from 'react'
-// import { useState } from 'react'
-
+import { Suspense,lazy } from 'react';
+const Home = lazy(() => import('./pages/landingpage/Home/Home'));
+const Dashboard = lazy(() => import('./pages/Dashboard/Dashboard'));
+const Signup = lazy(() => import('./pages/auth/signup/Signup'));
+const Login = lazy(() => import('./pages/auth/login/Login'));
+const Profile = lazy(() => import('./pages/Profile/Profile'));
+import NotFound from './pages/notFound/NotFound';
+import { ProtectedRoute } from './protectingRoute';
+import Loader from "./components/Loader"
+import { Toaster } from "sonner";
 function App() {
   return (
    <BrowserRouter>
+   <Suspense fallback={<Loader/>}>
+    <Toaster position="top-right" richColors />
    <Routes>
     <Route path="/" element={<Home/>}/>
-    <Route path="/workspace" element={<Dashboard/>}/>
-    <Route  path="/signup" element={<Signup/>}/>
-    <Route path="/login" element={<Login/>}/>
-    <Route path="/profile" element={<Profile/>}/>
+    <Route path="/workspace" element={<ProtectedRoute><Dashboard/></ProtectedRoute>}/>
+    <Route  path="/auth/signup" element={<Signup/>}/>
+    <Route path="/auth/login" element={<Login/>}/>
+    <Route path="/profile" element={<ProtectedRoute><Profile/></ProtectedRoute>}/>
+    <Route path="*" element={<NotFound/>}/>
    </Routes>
+   </Suspense>
    </BrowserRouter>
   )
 }

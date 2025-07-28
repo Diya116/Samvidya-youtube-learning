@@ -10,8 +10,8 @@ export const RegistrationSchema=z.object({
     }),
     password:z.string().trim().min(8,{
         message:"Be atleast 8 character long"
-    }).max(50,{
-       message:"Password must be atleast 50 character long"
+    }).max(100,{
+       message:"Password must be atleast 100 character long"
     })
 })
 
@@ -19,7 +19,8 @@ export const LoginSchema=z.object({
     email:z.string().trim().email({
         message:"Please enter valid email"
     }),
- password:z.string().trim().min(1,{
+ password:z.string().trim().min(8,{
     message:"Password field must not be empty"
- })
+ }).max(100,{
+    message:"Password must be at most 100 character long"})
 })
