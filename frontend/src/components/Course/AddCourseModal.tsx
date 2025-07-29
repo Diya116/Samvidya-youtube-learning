@@ -1,50 +1,37 @@
-import React, { useState } from 'react';
-import { Plus } from 'lucide-react';
+import React, { useState } from "react";
+import { Plus } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
-  Dialog, 
+  Dialog,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import type { Course } from '@/types/types';
-import {CourseForm} from "./CourseForm"
-import {addCourseApi} from '@/services/courseService';
-import { toast } from 'sonner';
-export const AddCourseModal: React.FC = () => {
-    const [isOpen, setIsOpen] = useState(false);
-    const handleCourseSubmit = async(course: Course) => {
-      try{
-      const response= await addCourseApi(course);
-      console.log('Course submitted:', response);
-      toast.success("course created successfully")
-      setIsOpen(false);
-      window.location.reload();
-      }
+  DialogTitle,
+  DialogHeader,
+} from "@/components/ui/dialog";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
-      catch(error){
-        console.error('Error submitting course:', error);
-      }
- 
-    };
-  
-    return (
-      <Dialog open={isOpen} onOpenChange={setIsOpen}>
-        <DialogTrigger asChild>
-          <Button className='cursor-pointer'>
-            <Plus className="w-4 h-4 mr-2" />
-            Add Course
-          </Button>
-        </DialogTrigger>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
-          <DialogHeader>
-            <DialogTitle>Create New Course</DialogTitle>
-          </DialogHeader>
-          <CourseForm onSubmit={handleCourseSubmit} />
-        </DialogContent>
-      </Dialog>
-    );
-  };
-  
-  export default AddCourseModal;
+const AddCourseModal: React.FC = () => {
+
+    const [isOpen,setIsOpen]=useState(false);
+  return (
+    <Dialog open={isOpen} onOpenChange={setIsOpen}>
+      <DialogTrigger asChild>
+        <Button className=" text-white hover:bg-primary/80 cursor-pointer">
+          <Plus />
+          Create Learning Path
+        </Button>
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Create New Learning Path</DialogTitle>
+          <DialogDescription>
+            Build your personalized course using YouTube videos as lessons
+          </DialogDescription>
+        </DialogHeader>
+        <p>add your course form here</p>
+      </DialogContent>
+    </Dialog>
+  );
+};
+
+export default AddCourseModal;
