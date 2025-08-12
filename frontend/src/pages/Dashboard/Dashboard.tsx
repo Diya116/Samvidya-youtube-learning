@@ -9,6 +9,7 @@ import { getCoursesApi } from "@/services/courseService";
 
 import type { CourseListType } from "@/types/course";
 
+
 const Dashboard: React.FC = () => {
   const [courses, setCourses] = useState<CourseListType[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
