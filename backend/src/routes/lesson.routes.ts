@@ -4,7 +4,7 @@ import {
   getLesson,
   postLesson,
   updateLesson,
-  deleteLesson,
+  deleteLesson
 } from '../controller/lesson/index';
 
 const router: Router = Router();

@@ -64,15 +64,18 @@ export const postLesson: RequestHandler = async (req: Request, res: Response): P
       return;
     }
 
-    const { title, description,url,duration,courseId } = validateData.data;
+    const { title, description,videoId,duration,order,courseId,thumbnail,status } = validateData.data;
 
     const lesson = await prisma.lesson.create({
       data: {
         title,
         description,
-        url,
+        videoId,
+        order,
         duration,
-        courseId
+        courseId,
+        thumbnail,
+        status
       },
     });
 
@@ -119,7 +122,7 @@ export const updateLesson: RequestHandler = async (req: Request, res: Response):
       return;
     }
 
-    const { title, description, url,
+    const { title, description, videoId,
         duration } = validateData.data;
 
     const updatedLesson = await prisma.lesson.update({
@@ -127,7 +130,7 @@ export const updateLesson: RequestHandler = async (req: Request, res: Response):
       data: {
         title,
         description,
-        url,
+        videoId,
         duration
       },
     });
@@ -181,4 +184,5 @@ export const deleteLesson: RequestHandler = async (req: Request, res: Response):
     res.status(500).json({ error: "Internal Server Error" });
   }
 };
+
 

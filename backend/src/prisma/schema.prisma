@@ -20,6 +20,7 @@ model Course {
   coverImg    String?
   userId      Int
   lessons     Lesson[]
+  activeLessonId String?
   user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -29,9 +30,11 @@ model Lesson {
   id          String   @id @default(cuid())
   title       String
   description String?
-  url         String
+  videoId     String
   thumbnail   String?
   duration    String
+  order       Int
+  status      String 
   courseId    String
   course      Course   @relation(fields: [courseId], references: [id])
   notes       Note[]
