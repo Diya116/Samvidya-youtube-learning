@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { useNavigate } from 'react-router-dom'
-import {  Sun } from "lucide-react";
 const Header = () => {
   const navigate = useNavigate();
   return (
@@ -13,14 +12,15 @@ const Header = () => {
          
 
           <div className="flex items-center space-x-4">
-            <Button
+            {/* theme changing toggle button */}
+            {/* <Button
               variant="ghost"
               size="icon"
               className="rounded-lg"
             >
               <Sun className="h-5 w-5" /> 
-            </Button>
-          <Button onClick={()=>navigate("/auth/login")} className="bg-[#0075de] text-white">Get Started</Button>
+            </Button> */}
+          <Button onClick={()=>navigate("/auth/signup")} className="bg-[#0075de] text-white cursor-pointer">Get Started</Button>
           </div>
         </div>
       </div>

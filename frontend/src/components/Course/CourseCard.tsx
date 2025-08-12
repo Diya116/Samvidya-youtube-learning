@@ -9,40 +9,39 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import {  Clock, BookOpen, ArrowRight, MoreVertical, Edit, Trash2 } from 'lucide-react';
-
+import { useNavigate } from 'react-router-dom';
 // Types
-interface Course {
-  id: string;
-  title: string;
-  description: string;
-  numberOfLessons: number;
-  totalHours: number;
-  completedLessons: number;
-  imageUrl?: string;
-  coverImg?: string; // Optional cover image URL
+type courseList={
+    id:string;
+    title:string;
+    description:string;
+    coverImg:string;
+    duration:string;
+    activeLessonId:string;
+    numberOfLesson:number;
+    completedLesson:number;
 }
-
 // Course Card Component
 interface CourseCardProps {
-  course: Course;
-  onAction: (courseId: string) => void;
-  onEdit: (courseId: string) => void;
-  onDelete: (courseId: string) => void;
+  course: courseList;
+  // onAction: (courseId: string) => void;
+  // onEdit: (courseId: string) => void;
+  // onDelete: (courseId: string) => void;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit, onDelete }) => {
-  const progressPercentage = Math.round((course.completedLessons / course.numberOfLessons) * 100);
-  const isStarted = course.completedLessons > 0;
+export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
+  const progressPercentage = Math.round((course.completedLesson / course.numberOfLesson) * 100);
+  const isStarted = course.completedLesson > 0;
   const defaultImage = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=240&fit=crop&crop=center";
-
+const navigate=useNavigate();
   return (
     <Card 
-      className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer  border-r-2 border-slate-400 bg-gray-100  w-full dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 "
-    >
+      className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer  border-r-2 border-slate-400 bg-white  w-full dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 "
+   onClick={()=>(navigate(`/learn/${course.id}?lesson=${course.activeLessonId}`))} >
       <div className="flex h-32">
         {/* Image Section - Left Side */}
         <div 
-          className="relative w-48 flex-shrink-0 bg-cover bg-center overflow-hidden"
+          className="relative w-52 flex-shrink-0 bg-cover bg-center overflow-hidden"
           style={{ 
             backgroundImage: `url(${course.coverImg || defaultImage})`,
             backgroundSize: 'cover',
@@ -86,7 +85,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit
                     <DropdownMenuItem 
                       onClick={(e) => {
                         e.stopPropagation();
-                        onEdit(course.id);
+                        // onEdit(course.id);
                       }}
                       className="cursor-pointer"
                     >
@@ -97,7 +96,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit
                     <DropdownMenuItem 
                       onClick={(e) => {
                         e.stopPropagation();
-                        onDelete(course.id);
+                        // onDelete(course.id);
                       }}
                       className="cursor-pointer text-red-600 focus:text-red-600"
                     >
@@ -120,20 +119,21 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit
               <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                 <div className="flex items-center space-x-1">
                   <BookOpen className="w-4 h-4" />
-                  <span className="font-mono">{course.numberOfLessons}</span>
+                  <span className="font-mono">{course.numberOfLesson}</span>
                   <span>lessons</span>
                 </div>
-                <div className="flex items-center space-x-1">
+                <div className="flex items-center space-x-1 text-primary bg-blue-100 border rounded-lg p-1">
                   <Clock className="w-4 h-4" />
-                  <span className="font-mono">{course.totalHours}h</span>
-                  <span>total</span>
+                  <span className="font-mono">{course.duration}</span>
+                  {/* <span>total</span> */}
                 </div>
               </div>
               
               <Button
                 onClick={(e) => {
                   e.stopPropagation();
-                  onAction(course.id);
+                  navigate(`/learn/${course.id}`)
+                  // onAction(course.id);
                 }}
                 className="inline-flex items-center space-x-1 px-3 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
               >
@@ -157,7 +157,7 @@ export const CourseCard: React.FC<CourseCardProps> = ({ course, onAction, onEdit
                     <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
                   </div>
                   <span className="text-xs text-gray-600 font-mono tabular-nums dark:text-gray-300">
-                    {course.completedLessons}/{course.numberOfLessons}
+                    {course.completedLesson}/{course.numberOfLesson}
                   </span>
                 </div>
               </div>

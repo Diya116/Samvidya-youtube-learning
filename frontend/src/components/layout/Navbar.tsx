@@ -26,7 +26,7 @@ const {  logout } = useAuth();
         {/* Logo Section */}
         <div className="flex items-center">
           <h1 className="text-2xl font-bold tracking-tight text-gray-900 dark:text-white">
-            <span className="text-black dark:text-white">Samvidya</span>
+            <span className="text-secondary">Samvidya</span>
           </h1>
         </div>
 

@@ -1,13 +1,13 @@
 import { Request, Response, RequestHandler, NextFunction } from "express";
 import prisma from "../../lib/db";
 import { courseSchema } from "./schema";
+import {calculateTotalDuration} from "../../utils/calculateTotalDuration"
 export const getCourse: RequestHandler = async (
   req: Request,
   res: Response
 ): Promise<void> => {
   try {
     const { id } = req.params;
-
     const course = await prisma.course.findFirst({
       where: { id },
       include: {
@@ -34,17 +34,28 @@ export const getAllCourses: RequestHandler = async (
 ) => {
   const authReq = req as AuthenticatedRequest;
   const userId = authReq.user?.id;
+  if(!userId)
+  {
+    res.status(404).json({message:"user not exist"})
+  }
   try {
     const courses = await prisma.course.findMany({
+         where: {
+        userId: userId,
+      },
       include: {
         lessons: true,
         user: true,
-      },
-      where: {
-        userId: userId,
-      },
+      }
     });
-    res.status(200).json(courses);
+    const formattedCourses = courses.map((course) => ({
+      ...course,
+      numberOfLesson: course.lessons.length,
+      duration: calculateTotalDuration(course.lessons),
+      completedLesson: course.lessons.filter((l) => l.status === "COMPLETED")
+        .length,
+    }));
+    res.status(200).json(formattedCourses);
   } catch (error) {
     console.error("Error fetching courses:", error);
     res.status(500).json({
@@ -102,13 +113,22 @@ export const postCourse = async (
           create: lessons.map((lesson: any) => ({
             title: lesson.title,
             description: lesson.description,
-            url: lesson.videoUrl,
+            videoId: lesson.videoId,
+            thumbnail: lesson.thumbnail,
             duration: lesson.duration,
+            order: lesson.order,
+            status: "NA",
           })),
         },
       },
+      include: { lessons: true },
     });
-
+    const activeLessonId = course.lessons.filter((i: any) => i.order === 1)[0]
+      .id;
+    await prisma.course.update({
+      where: { id: course.id },
+      data: { activeLessonId: activeLessonId },
+    });
     res.status(201).json({
       message: "Course Created Successfully",
       course,
@@ -216,6 +236,111 @@ export const deleteCourse: RequestHandler = async (
     });
   } catch (error) {
     console.error("Error while deleting course:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const courseProgress = async (req: Request, res: Response) => {
+  try {
+    console.log("i am called-backend");
+    console.log(req.body);
+    const { id, activeLessonId } = req.body;
+    console.log("id", id);
+    console.log("activeLessonId", activeLessonId);
+    if (!id || !activeLessonId) {
+      res.status(400).json({ error: "course id or activelesson id not there" });
+    }
+    const existingCourse = await prisma.course.findFirst({
+      where: { id },
+    });
+
+    if (!existingCourse) {
+      res.status(404).json({ error: "Course not found" });
+      return;
+    }
+    await prisma.course.update({
+      where: { id },
+      data: { activeLessonId },
+    });
+    console.log("updated");
+    res.status(201).json({
+      message: "Course activelessonid updated succesfully",
+    });
+  } catch (error) {
+    console.error("Error while deleting course:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+type ReorderLesson = { id: string; order: number };
+export const reorderLessons = async (req: Request, res: Response) => {
+  try {
+    const lessons = req.body;
+    const { courseId } = req.params;
+    if (!courseId) {
+      res.status(400).json({ error: "Course ID is required" });
+      return;
+    }
+    const existingCourse = await prisma.course.findFirst({
+      where: { id: courseId },
+    });
+
+    if (!existingCourse) {
+      res.status(404).json({ error: "Course not found" });
+      return;
+    }
+    const course = await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        lessons: {
+          updateMany: await Promise.all(
+            lessons.data.map((lesson: ReorderLesson) => ({
+              where: { id: lesson.id },
+              data: { order: lesson.order },
+            }))
+          ),
+        },
+      },
+    });
+    res.status(200).json({ message: "Lessons reordered successfully" });
+  } catch (error) {
+    console.error("Error while reordering lessons:", error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+};
+
+export const updateStatusOfLesson = async (req: Request, res: Response) => {
+  try {
+    const { lessonId, status } = req.body;
+    const { courseId } = req.params;
+    if (!courseId || !lessonId || !status) {
+      res
+        .status(400)
+        .json({ error: "Course ID, Lesson ID, and status are required" });
+      return;
+    }
+    const existingCourse = await prisma.course.findFirst({
+      where: { id: courseId },
+    });
+
+    if (!existingCourse) {
+      res.status(404).json({ error: "Course not found" });
+      return;
+    }
+    await prisma.course.update({
+      where: { id: courseId },
+      data: {
+        lessons: {
+          update: {
+            where: { id: lessonId },
+            data: { status: status },
+          },
+        },
+      },
+    });
+    res.status(200).json({ message: "Lesson status updated successfully" });
+  } catch (error) {
+    console.error("Error while updating lesson status:", error);
     res.status(500).json({ error: "Internal Server Error" });
   }
 };

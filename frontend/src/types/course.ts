@@ -1,12 +1,7 @@
-export interface Lesson {
-    id: string;
-    title: string;
-    description: string;
-    videoUrl: string;
-    duration?: string;
-  }
+import type { Lesson } from "./lesson";
   
   export interface Course {
+    id?:string;
     title: string;
     description: string;
     coverImg: string;
@@ -16,9 +11,19 @@ export interface Lesson {
   export interface YouTubeVideoDetails {
   title: string;
   description: string;
-  duration: string; // e.g., "10:30"
+  duration: string; 
 }
 
   export type FormErrors = {
     [key: string]: string;
 };
+export type CourseListType={
+    id:string;
+    title:string;
+    description:string;
+    coverImg:string;
+    duration:string;
+    numberOfLesson:number;
+    completedLesson:number;
+    activeLessonId:string;
+}

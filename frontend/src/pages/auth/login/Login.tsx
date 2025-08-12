@@ -126,7 +126,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
               <Button
                 type="button"
-                className="w-full"
+                className="w-full cursor-pointer"
                 disabled={isLoading}
                 onClick={handleSubmit}
               >
@@ -139,7 +139,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 Don't have an account?{" "}
                 <button
                   onClick={() => navigate("/auth/signup")}
-                  className="text-black hover:underline font-medium dark:text-white"
+                  className="text-black hover:underline font-medium dark:text-white cursor-pointer"
                   type="button"
                 >
                   Sign up
