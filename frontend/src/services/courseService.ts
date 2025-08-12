@@ -43,7 +43,8 @@ export const updateCourseApi = async (courseId: string, course: Course) => {
 
 export const deleteCourseApi = async (courseId: string) => {
     try {
-        await api.delete(`${BACKEND_BASE_URL}/course/${courseId}`);
+       const response= await api.delete(`${BACKEND_BASE_URL}/course/${courseId}`);
+       return response;
     } catch (error) {
         console.error("Error deleting course:", error);
         throw error; 
