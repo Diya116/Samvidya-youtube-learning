@@ -3,7 +3,8 @@ import type {Course} from "@/types/course";
  const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL;
  export const addCourseApi = async (course: Course) => {
     try{
-     await api.post(`${BACKEND_BASE_URL}/course`, course)
+     const response=await api.post(`${BACKEND_BASE_URL}/course`, course);
+     return response.data;
     }
     catch(error)
     {

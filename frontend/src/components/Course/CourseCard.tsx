@@ -11,7 +11,6 @@ import {
 import { Button } from '@/components/ui/button';
 import {  Clock, BookOpen, ArrowRight, MoreVertical, Edit, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { deleteCourseApi } from '@/services/courseService';
 // Types
 type courseList={
     id:string;
@@ -28,21 +27,19 @@ interface CourseCardProps {
   course: courseList;
   // onAction: (courseId: string) => void;
   // onEdit: (courseId: string) => void;
-  // onDelete: (courseId: string) => void;
+  onDelete: (courseId: string) => void;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course }) => {
-  const onDelete=async(courseId:string)=>{
-    if(!window.confirm("Are you sure you want to delete this course?"))
-      return;
-   const response=await deleteCourseApi(courseId);
-   if(response.status===200)
-   {
-    alert("course deleted");
-     //reload page
-     window.location.reload();
-   }
-  }
+export const CourseCard: React.FC<CourseCardProps> = ({ course,onDelete}) => {
+  // const onDelete=async(courseId:string)=>{
+  //   if(!window.confirm("Are you sure you want to delete this course?"))
+  //     return;
+  //  const response=await deleteCourseApi(courseId);
+  //  if(response.status===200)
+  //  {
+  //    window.location.reload();
+  //  }
+  // }
   const progressPercentage = Math.round((course.completedLesson / course.numberOfLesson) * 100);
   const isStarted = course.completedLesson > 0;
   const defaultImage = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=240&fit=crop&crop=center";
