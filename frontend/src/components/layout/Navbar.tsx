@@ -34,6 +34,7 @@ const {  logout } = useAuth();
         <div className="flex items-center gap-3">
           {/* Theme Toggle */}
           <Button
+          aria-label='change-theme'
             variant="ghost"
             size="sm"
             onClick={toggleTheme}
@@ -49,7 +50,7 @@ const {  logout } = useAuth();
           {/* Profile Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="cursor-pointer relative h-8 w-8 rounded-full">
+              <Button aria-label='profile' variant="ghost" className="cursor-pointer relative h-8 w-8 rounded-full">
                 <Avatar className="h-8 w-8">
                   <AvatarImage src="/placeholder-avatar.jpg" alt="Profile" />
                   <AvatarFallback className="bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-300">

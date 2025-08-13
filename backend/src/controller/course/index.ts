@@ -49,9 +49,14 @@ export const getAllCourses: RequestHandler = async (
       }
     });
     const formattedCourses = courses.map((course) => ({
-      ...course,
+      id: course.id,
+      title: course.title,
+      description: course.description,
+      coverImg: course.coverImg,
+      userId: course.userId,
+      activeLessonId: course.activeLessonId,
+      duration: course.totalDuration,
       numberOfLesson: course.lessons.length,
-      duration: calculateTotalDuration(course.lessons),
       completedLesson: course.lessons.filter((l) => l.status === "COMPLETED")
         .length,
     }));
@@ -103,12 +108,14 @@ export const postCourse = async (
 
     const { title, description, coverImg } = validateData.data;
     const { lessons } = req.body;
+    const totalDuration = calculateTotalDuration(lessons);
     const course = await prisma.course.create({
       data: {
         title,
         description,
         coverImg,
         userId,
+        totalDuration,
         lessons: {
           create: lessons.map((lesson: any) => ({
             title: lesson.title,
@@ -123,15 +130,14 @@ export const postCourse = async (
       },
       include: { lessons: true },
     });
-    const activeLessonId = course.lessons.filter((i: any) => i.order === 1)[0]
-      .id;
-    await prisma.course.update({
+    const activeLessonId = course.lessons.filter((i: any) => i.order === 1)[0].id;
+   const updatedCourse = await prisma.course.update({
       where: { id: course.id },
       data: { activeLessonId: activeLessonId },
     });
     res.status(201).json({
       message: "Course Created Successfully",
-      course,
+      updatedCourse,
     });
   } catch (error) {
     console.error("Error while creating course:", error);
@@ -224,7 +230,6 @@ export const deleteCourse: RequestHandler = async (
 
     if (!existingCourse) {
       res.status(404).json({ error: "Course not found" });
-      return;
     }
 
     await prisma.course.delete({
