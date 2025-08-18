@@ -1,5 +1,5 @@
 import { useState ,useEffect} from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 //schema and type
@@ -27,7 +27,12 @@ const LoginForm = () => {
   });
   const [error, setError] = useState<string>("");
   const [isLoading, setIsLoading] = useState<boolean>(false);
+useEffect(()=>{
+  // const {isAuthenticated}=useAuth();
+  //isAuthenticated value is not working in useEffect
+  // console.log("clg",isAuthenticated)
 
+}, []);
   useEffect(() => {
     if (error) {
       const timer = setTimeout(() => {
@@ -79,8 +84,14 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       handleSubmit();
     }
   };
+  const {isAuthenticated}=useAuth();
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
+{/* {
+  isAuthenticated() && (
+   <Navigate to="/workspace" replace />
+  )
+} */}
       <div className="w-full max-w-md">
         <Card className="w-full">
           <CardHeader>

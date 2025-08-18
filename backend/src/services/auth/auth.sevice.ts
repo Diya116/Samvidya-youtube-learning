@@ -167,6 +167,43 @@ class AuthService {
       //req.user=userPayload
     } catch (error) {}
   };
-}
+ public refreshToken = async (req: Request, res: Response) => {
+  try {
+    // Ensure cookies are parsed (need cookie-parser middleware)
+    const refreshToken = req.cookies?.refreshToken;
+    console.log("Cookies from request:", req.cookies);
+    console.log("Refresh token from request:", refreshToken);
 
+    if (!refreshToken) {
+      return res.status(400).json({ error: "Refresh token not found" });
+    }
+
+    let userPayload;
+    try {
+      userPayload = authTokenService.verifyRefreshToken(refreshToken);
+    } catch (err:any) {
+      if (err.name === "TokenExpiredError") {
+        console.error("Refresh token expired:", err);
+        return res.status(401).json({ error: "Refresh token expired" });
+      }
+      console.error("Error verifying refresh token:", err);
+      return res.status(401).json({ error: "Invalid refresh token" });
+    }
+
+    if (!userPayload) {
+      return res.status(403).json({ error: "Invalid refresh token" });
+    }
+
+    console.log("User payload from refresh token:", userPayload);
+    
+    const newAccessToken = authTokenService.generateAccessToken({id:userPayload.id,email:userPayload.email,name:userPayload.name} as UserPayloadPrivate);
+    
+    return res.status(200).json({ accessToken: newAccessToken });
+
+  } catch (error) {
+    console.error("Unexpected error refreshing token:", error);
+    return res.status(500).json({ error: "Internal server error" });
+  }
+};
+}
 export const authService = AuthService.getInstance();

@@ -4,12 +4,12 @@ function Profile() {
   const { user } = useAuth();
 
   return (
-    <div>
-      <h1>Profile</h1>
+    <div className="">
+      <h1 className="text-primary font-bold text-5xl m-9">Good Morning, {user?.name}</h1>
       {user ? (
         <div>
-          <p>Name: {user.name}</p>
-          <p>Email: {user.email}</p>
+          <button className="p-2 bg-blue-300 border rounded">Edit Profile</button>
+          <button>Set Daily Goal</button>
         </div>
       ) : (
         <p>Please log in to view your profile.</p>
