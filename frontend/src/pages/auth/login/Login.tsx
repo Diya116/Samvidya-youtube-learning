@@ -1,5 +1,5 @@
 import { useState ,useEffect} from "react";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 //schema and type
@@ -84,7 +84,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       handleSubmit();
     }
   };
-  const {isAuthenticated}=useAuth();
+  //const {isAuthenticated}=useAuth();
   return (
     <div className="min-h-screen bg-white flex items-center justify-center p-4">
 {/* {

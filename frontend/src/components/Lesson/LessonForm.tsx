@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-import { Card,CardContent } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,6 +15,7 @@ import type { YouTubeVideoDetails } from "@/types/types";
 import { fetchYouTubeDetails } from "@/services/fetchYouTubeDetails";
 import { fetchPlaylistVideo } from "@/services/fetchYouTubeDetails";
 import { extractVideoId } from "@/utils/extractVideoId";
+
 export const LessonForm: React.FC<{
   onAddLessons: (lesson: Lesson[]) => void;
   onAddLesson: (lesson: Omit<Lesson, "id">) => void;
@@ -28,7 +29,6 @@ export const LessonForm: React.FC<{
   editingLesson,
   onUpdateLesson,
 }) => {
-
   const [activeTab, setActiveTab] = useState("single");
   const [lessonData, setLessonData] = useState({
     title: editingLesson?.title || "",
@@ -38,36 +38,46 @@ export const LessonForm: React.FC<{
     thumbnail: editingLesson?.thumbnail || "",
     //order: editingLesson?.order,
   });
- // const [playlistData, setPlaylistData] = useState([]);
+  // const [playlistData, setPlaylistData] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [playlistUrl, setPlaylistUrl] = useState("");
   //const [order, setOrder] = useState(0);
   const [singleVideoUrl, setSingleVideoUrl] = useState("");
   const [isLoadingPlaylist, setIsLoadingPlaylist] = useState(false);
-
-
+  //set error for yt singlevideo+playlist
+  const [error, setError] = useState<{ video?: string; playlist?: string }>({});
   const importFromPlaylist = async () => {
     if (!playlistUrl) return;
     try {
       setIsLoadingPlaylist(true);
+      setError((prev) => ({ ...prev, playlist: undefined }));
       const playlist: Lesson[] | null = await fetchPlaylistVideo(playlistUrl);
+      console.log(playlist);
       if (playlist) {
-         //const newPlaylist=playlist?.map(item=>({...item,order:order+1}))
+        //const newPlaylist=playlist?.map(item=>({...item,order:order+1}))
         onAddLessons(playlist);
-        setIsLoadingPlaylist(false)
+        setIsLoadingPlaylist(false);
       }
     } catch (error) {
+      setError((prev) => ({
+        ...prev,
+        playlist:
+          "Failed to fetch playlist. Please check the URL and try again it must be a valid and public url.",
+      }));
       setIsLoadingPlaylist(false);
       console.error("Failed to fetch playlist video:", error);
+    } finally {
+      setIsLoadingPlaylist(false);
     }
   };
   const handleFetchDetails = async () => {
     if (!lessonData.videoId) return;
     setIsLoading(true);
+    setError((prev) => ({ ...prev, video: undefined }));
     try {
       const details: YouTubeVideoDetails | null = await fetchYouTubeDetails(
         lessonData.videoId
-      ); 
+      );
       if (details) {
         setLessonData((prev) => ({
           ...prev,
@@ -77,9 +87,14 @@ export const LessonForm: React.FC<{
           thumbnail: details.thumbnail,
           //order: order + 1,
         }));
-       // setOrder((prev) => prev + 1);
+        // setOrder((prev) => prev + 1);
       }
     } catch (error) {
+      setError((prev) => ({
+        ...prev,
+        video:
+          "Failed to fetch. Please check the URL and try again it must be a valid and public url.",
+      }));
       console.error("Failed to fetch video details:", error);
     } finally {
       setIsLoading(false);
@@ -117,23 +132,28 @@ export const LessonForm: React.FC<{
               <div className="space-y-4">
                 {/* YouTube URL Input */}
                 <div className="space-y-2">
+                  {error.video && (
+                    <p className="text-red-600 mt-2 border border-red-400 p-2 rounded bg-red-50">
+                      {error.video}
+                    </p>
+                  )}
                   <Label htmlFor="videoUrl">YouTube Video URL</Label>
-                  <div className="flex gap-2">
+                  <div className="flex flex-col gap-2 sm:flex">
                     <div className="relative flex-1">
                       <Youtube className="absolute left-3 top-3 h-4 w-4 text-red-500" />
                       <Input
                         id="videoUrl"
                         placeholder="https://www.youtube.com/watch?v=..."
                         value={singleVideoUrl}
-                        onChange={(e) =>{
-                          setSingleVideoUrl(e.target.value)
-                          const getvideoId=extractVideoId(e.target.value)||'';
+                        onChange={(e) => {
+                          setSingleVideoUrl(e.target.value);
+                          const getvideoId =
+                            extractVideoId(e.target.value) || "";
                           setLessonData((prev) => ({
                             ...prev,
-                            videoId:getvideoId
-                          }))
-                        }
-                        }
+                            videoId: getvideoId,
+                          }));
+                        }}
                         className="pl-10"
                         required
                       />
@@ -222,6 +242,11 @@ export const LessonForm: React.FC<{
             </TabsContent>
             <TabsContent value="playlist" className="space-y-4">
               <div>
+                {error.playlist && (
+                  <p className="text-red-600 mt-2 border border-red-400 p-2 rounded bg-red-50">
+                    {error.playlist}
+                  </p>
+                )}
                 <Label htmlFor="playlistUrl">YouTube Playlist URL</Label>
                 <div className="flex gap-2 mt-1">
                   <Input

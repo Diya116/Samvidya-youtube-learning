@@ -1,154 +1,95 @@
-import { useState, useEffect } from "react";
-
-import Navbar from "@/components/layout/Navbar";
-import CourseList from "@/components/Course/CoursList";
-import Loader from "@/components/Loader";
-import { getCoursesApi, deleteCourseApi } from "@/services/courseService";
-
-import type { CourseListType } from "@/types/course";
-
-import { Plus } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import ContinueLearning from "@/components/continuelearning/ContinueLearning";
+import ContinueReacding from "@/components/continuelearning/ContinueReacding";
+import { PlayIcon, Timer } from "lucide-react";
+import flower from "../../assets/flower.gif";
+import { CircularProgressWidget } from "@/components/widget/CircularProgressWidget";
 import { Button } from "@/components/ui/button";
-import type { Course } from "@/types/course";
-import { CourseForm } from "@/components/Course/CourseForm";
-import { addCourseApi } from "@/services/courseService";
-import { toast } from "sonner";
-const Dashboard: React.FC = () => {
-  const [courses, setCourses] = useState<CourseListType[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [isOpen, setIsOpen] = useState(false);
-  useEffect(() => {
-    let isMounted = true;
+import { useAuth } from "@/context/AuthContext";
+//import { Navigate } from "react-router-dom";
 
-    const fetchCourses = async () => {
-      try {
-        setLoading(true);
-        setError(null);
-        const startTime = Date.now();
-        const courseData = await getCoursesApi();
-        console.log(courseData);
-        const endTime = Date.now() - startTime;
-        console.log(endTime / 1000);
-        if (isMounted) {
-          setCourses(courseData);
-        }
-      } catch (err) {
-        console.error("Failed to fetch courses:", err);
-        if (isMounted) {
-          setError("Unable to load courses. Please try again later.");
-        }
-      } finally {
-        if (isMounted) {
-          setLoading(false);
-        }
-      }
-    };
-
-    fetchCourses();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
-
-  const handleCourseSubmit = async (newCourse: Course) => {
-    try {
-      const response = await addCourseApi(newCourse);
-      console.log("Course submitted:", response);
-      toast.success("course created successfully");
-      setIsOpen(false);
-      const updateCourse: CourseListType = {
-        ...response.course,
-        duration: response.course.totalDuration,
-        numberOfLesson: response.course.lessons.length,
-        completedLesson: 0,
-      };
-
-      setCourses((prevCourses) => [...prevCourses, updateCourse]);
-      // window.location.reload();
-    } catch (error) {
-      console.error("Error submitting course:", error);
-    }
-  };
-  const handleCourseDelete = async (courseId: string): Promise<void> => {
-    try {
-      if (window.confirm("Are you sure you want to delete this course?")) {
-        const response = await deleteCourseApi(courseId);
-        console.log(response);
-        if (response.status === 200) {
-          setCourses((prevCourses) =>
-            prevCourses.filter((course) => course.id !== courseId)
-          );
-          toast.success("Course deleted successfully.");
-        }
-      }
-    } catch (err) {
-      toast.error("failed to delete course");
-      console.error("Failed to delete course:", err);
-    }
-  };
+function Dashboard() {
+  const { user } = useAuth();
   return (
-    <div>
-      <Navbar />
-      <div className="min-h-screen bg-background p-6 pt-10">
-        <div className="flex justify-end">
-          <Dialog open={isOpen} onOpenChange={setIsOpen}>
-            <DialogTrigger asChild>
-              <Button className="cursor-pointer dark:text-white">
-                <Plus className="h-4 mr-2" />
-                Create New Learning Path
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="!max-w-none w-[50vw] max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Create New Learning Path</DialogTitle>
-                <DialogDescription>
-                  Build your personalized course using YouTube videos as lessons
-                </DialogDescription>
-              </DialogHeader>
-              <CourseForm onSubmit={handleCourseSubmit} />
-            </DialogContent>
-          </Dialog>
-        </div>
-
-        <div className="flex flex-col justify-center mt-6">
-          {loading && <Loader />}
-
-          {error && (
-            <p className="text-red-500 text-center mt-4" role="alert">
-              {error}
-            </p>
-          )}
-
-          {!loading && !error && courses.length > 0 ? (
-            <CourseList
-              courses={courses}
-              handleCourseDelete={handleCourseDelete}
-            />
-          ) : (
-            !loading &&
-            !error && (
-              <div className="text-center text-gray-500 mt-6">
-                <h2 className="text-lg font-semibold">
-                  No courses created yet.
-                </h2>
-                <p>Start by creating your first course.</p>
+    <div className="min-h-screen bg-background p-4 sm:p-6 pt-6 sm:pt-10">
+      <div className="max-w-7xl mx-auto">
+        {/* Main layout - two columns on desktop */}
+        <div className="flex flex-col xl:flex-row gap-6 lg:gap-8">
+          {/* Left column - Main content */}
+          <div className="flex-1">
+            {/* Banner section - limited width */}
+            <div className="max-w-3xl bg-gradient-to-r from-primary/10 to-secondary/10 rounded-2xl p-4 sm:p-6 mb-6 sm:mb-8 lg:mb-10">
+              <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="flex-1">
+                  <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">
+                    Hi, {user?.name || "learner"}
+                  </h1>
+                  <p className="text-muted-foreground text-base sm:text-lg mb-3 sm:mb-4">
+                    Ready to learn something new today?
+                  </p>
+                  <Button className="cursor-pointer" onClick={()=>{
+                    localStorage.getItem("lastLearningUrl") && (window.location.href=localStorage.getItem("lastLearningUrl")||"")
+                  }}>
+                    <PlayIcon className="w-4 h-4 mr-2" />
+                    Back to Learning
+                  </Button>
+                </div>
+                <div className="flex-shrink-0">
+                  <img src={flower} className="w-16 sm:w-20 lg:w-24" alt="Flower decoration" />
+                </div>
               </div>
-            )
-          )}
+            </div>
+
+            {/* Continue learning section */}
+            <div className="mb-8 lg:mb-10">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">
+                Continue Learning
+              </h2>
+              <ContinueLearning />
+            </div>
+
+            {/* Continue reading section */}
+            <div className="mb-8 lg:mb-10">
+              <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-4">
+                Continue Reading
+              </h2>
+              <ContinueReacding />
+            </div>
+          </div>
+
+          {/* Right column - Sidebar (starts from top) */}
+          <div className="w-full xl:w-[300px] flex-shrink-0 space-y-4 lg:space-y-6">
+            {/* Pomodoro button */}
+            <div className="flex justify-center xl:justify-start">
+              <Button className="bg-black hover:bg-black/90 w-full sm:w-auto">
+                <Timer className="w-5 h-5 mr-2" />
+                Set Pomodoro
+              </Button>
+            </div>
+
+            {/* Progress widget */}
+            <div className="flex justify-center xl:justify-start">
+              <CircularProgressWidget currentHours={5} goalHours={8} />
+            </div>
+
+            {/* Spotify player */}
+            <div className="w-full">
+              <div className="aspect-[5/6] w-full max-w-[300px] mx-auto xl:mx-0">
+                <iframe
+                  className="rounded-xl w-full h-full"
+                  src="https://open.spotify.com/embed/album/20s8MvS66EURHtY9Ya3ERs?utm_source=generator"
+                  frameBorder="0"
+                  allowFullScreen
+                  allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                  loading="lazy"
+                  title="Spotify Player"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
-};
+}
 
-export default Dashboard
+export default Dashboard;

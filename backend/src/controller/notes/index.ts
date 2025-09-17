@@ -50,14 +50,17 @@ export const getAllNotesOfUser = async (req: Request, res: Response) => {
     const userId = authReq.user?.id;
 
     if (!userId) {
-      return res.status(401).json({ error: "Unauthorized access: user Id not found" });
+       res.status(401).json({ error: "Unauthorized access: user Id not found" });
+       return;
     }
 
     const notes = await prisma.note.findMany({ where: { userId } });
-    return res.status(200).json({ notes });
+    res.status(200).json({ notes });
+    return;
   } catch (error) {
     console.error("Error while fetching notes:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+     res.status(500).json({ error: "Internal Server Error" });
+     return;
   }
 };
 
@@ -68,18 +71,22 @@ export const getSingleNoteById = async (req: Request, res: Response) => {
     const noteId = req.params.id;
 
     if (!userId) {
-      return res.status(401).json({ error: "Unauthorized access" });
+      res.status(401).json({ error: "Unauthorized access" });
+      return;
     }
 
     const note = await prisma.note.findFirst({ where: { id: noteId, userId } });
     if (!note) {
-      return res.status(404).json({ error: "Note not found" });
+       res.status(404).json({ error: "Note not found" });
+       return;
     }
 
-    return res.status(200).json({ note });
+     res.status(200).json({ note });
+     return;
   } catch (error) {
     console.error("Error while fetching note by ID:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+     res.status(500).json({ error: "Internal Server Error" });
+     return;
   }
 };
 
@@ -110,20 +117,24 @@ export const updateNote = async (req: Request, res: Response) => {
   try {
     const authReq = req as AuthenticatedRequest;
     const userId = authReq.user?.id;
+    console.log("userId",userId)
     const noteId = req.params.id;
-
+     console.log("note id",noteId)
     if (!userId) {
-      return res.status(401).json({ error: "Unauthorized access" });
+       res.status(401).json({ error: "Unauthorized access" });
+      return;
     }
 
     const existingNote = await prisma.note.findFirst({ where: { id: noteId, userId } });
     if (!existingNote) {
-      return res.status(404).json({ error: "Note not found or not owned by user" });
+       res.status(404).json({ error: "Note not found or not owned by user" });
+       return;
     }
 
     const validateData = noteSchema.partial().safeParse(req.body); 
     if (!validateData.success) {
-      return res.status(400).json({ error: validateData.error.errors });
+       res.status(400).json({ error: validateData.error.errors });
+       return;
     }
 
     const updatedNote = await prisma.note.update({
@@ -131,10 +142,12 @@ export const updateNote = async (req: Request, res: Response) => {
       data: validateData.data,
     });
 
-    return res.status(200).json({ message: "Note updated successfully", note: updatedNote });
+     res.status(200).json({ message: "Note updated successfully", note: updatedNote });
+     return;
   } catch (error) {
     console.error("Error while updating note:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+     res.status(500).json({ error: "Internal Server Error" });
+     return;
   }
 };
 

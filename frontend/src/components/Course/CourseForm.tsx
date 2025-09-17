@@ -1,6 +1,4 @@
-//this screen include course detail->include
-//name,description,url,option for lesson add,lessons list
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 import { Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,9 +11,19 @@ import type { Lesson } from "@/types/lesson";
 
 import LessonForm from "../Lesson/LessonForm";
 import { LessonList } from "../Lesson/LessonList";
+import { getCourseByIdApi } from "@/services/courseService";
 
-export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
+import { courseSchema } from "@/validation/course-schema";
+interface CourseFormProps {
+  onSubmit: (course: Course) => void;
+  editingCourseId?: string;
+  isEdit?: boolean;
+}
+
+export const CourseForm: React.FC<CourseFormProps> = ({
   onSubmit,
+  editingCourseId,
+  isEdit = false,
 }) => {
   const [courseData, setCourseData] = useState<Course>({
     title: "",
@@ -29,6 +37,48 @@ export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
     undefined
   );
   const [loading, setLoading] = useState<boolean>(false);
+  const [loadingCourseData, setLoadingCourseData] = useState<boolean>(false);
+
+  // Initialize form data when editing
+  useEffect(() => {
+    async function fetchCourseData(id: string) {
+      if (!id) return;
+      
+      try {
+        setLoadingCourseData(true);
+        const response = await getCourseByIdApi(id);
+        console.log('Fetched course data:', response);
+        const editingCourse = response;
+        
+        if (editingCourse) {
+          setCourseData({
+            id: editingCourse.id,
+            title: editingCourse.title,
+            description: editingCourse.description,
+            coverImg: editingCourse.coverImg,
+            lessons: editingCourse.lessons || [],
+          });
+        }
+      } catch (error) {
+        console.error('Error fetching course data:', error);
+      } finally {
+        setLoadingCourseData(false);
+      }
+    }
+
+    if (isEdit && editingCourseId) {
+      fetchCourseData(editingCourseId);
+    } else if (!isEdit) {
+      // Reset form for new course
+      setCourseData({
+        title: "",
+        description: "",
+        coverImg: "",
+        lessons: [],
+      });
+    }
+  }, [isEdit, editingCourseId]);
+
   const handleAddLesson = (lessonData: Omit<Lesson, "id">) => {
     const maxOrder = courseData.lessons.length;
     const newLesson: Lesson = {
@@ -41,6 +91,7 @@ export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
       lessons: [...prev.lessons, newLesson],
     }));
   };
+
   const handleAddLessons = (lessonarray: Lesson[]) => {
     let maxOrder = courseData.lessons.length;
     const newLessons = lessonarray.map((lesson) => {
@@ -52,6 +103,7 @@ export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
       lessons: [...prev.lessons, ...newLessons],
     }));
   };
+
   const handleUpdateLesson = (updatedLesson: Lesson) => {
     setCourseData((prev) => ({
       ...prev,
@@ -62,6 +114,8 @@ export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
   };
 
   const handleDeleteLesson = (id: string) => {
+    console.log("delete clicked")
+    console.log(id)
     setCourseData((prev) => ({
       ...prev,
       lessons: prev.lessons.filter((lesson) => lesson.id !== id),
@@ -72,29 +126,37 @@ export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
     setEditingLesson(lesson);
     setCurrentView("lesson");
   };
+
   const handleReorderLessons = (lessons: Lesson[]) => {
     setCourseData((prev) => ({
       ...prev,
       lessons: lessons,
     }));
   };
-  const handleSubmit =async () => {
+
+  const handleSubmit = async () => {
     if (!courseData.title || courseData.lessons.length === 0) return;
+    
     try {
       setLoading(true);
+      
+      let finalCourseData = { ...courseData };
+      
+      // Set cover image from first lesson if not provided
       if (!courseData.coverImg || courseData.coverImg === "") {
-        console.log(courseData.lessons.findIndex((l) => l.order === 1));
-        const updatedCourseData = {
-          ...courseData,
-          coverImg:
-            courseData.lessons[
-              courseData.lessons.findIndex((l) => l.order === 1)
-            ].thumbnail || "",
-        };
-        await onSubmit(updatedCourseData);
+        const firstLesson = courseData.lessons.find((l) => l.order === 1);
+        if (firstLesson) {
+          finalCourseData.coverImg = firstLesson.thumbnail || "";
+        }
+      }
+      // Validate data using Zod schema
+      const validation = courseSchema.safeParse(finalCourseData);
+      if (!validation.success) {
+        const errorMessages = validation.error.errors.map((err) => err.message).join(", ");
+        alert(`Validation Error: ${errorMessages}`);
         return;
       }
-      await onSubmit(courseData);
+      await onSubmit(finalCourseData);
     } finally {
       setLoading(false);
     }
@@ -179,21 +241,35 @@ export const CourseForm: React.FC<{ onSubmit: (course: Course) => void }> = ({
           onReorderLessons={handleReorderLessons}
         />
       </div>
-
+   {/*error info*/}
+   
       {/* Submit Button */}
       <div className="flex justify-end pt-4 border-t">
         <Button
           onClick={handleSubmit}
           disabled={
-            !courseData.title || courseData.lessons.length === 0 || loading
+            !courseData.title || courseData.lessons.length ===0 || loading
           }
           className="min-w-32 cursor-pointer"
         >
-          {loading ? "Creating..." : "Create Course"}
+          {loading 
+            ? (isEdit ? "Updating..." : "Creating...") 
+            : (isEdit ? "Update Course" : "Create Course")
+          }
         </Button>
       </div>
     </div>
   );
+
+  // Show loading spinner while fetching course data
+  if (loadingCourseData) {
+    return (
+      <div className="flex items-center justify-center py-8">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span className="ml-2">Loading course details...</span>
+      </div>
+    );
+  }
 
   return (
     <div>

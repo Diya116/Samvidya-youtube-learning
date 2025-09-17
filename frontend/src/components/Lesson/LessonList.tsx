@@ -111,7 +111,6 @@ export const LessonList: React.FC<{
       onReorderLessons(newItems);
     }
   }
-  console.log(lessons);
   if (lessons.length === 0) {
     return (
       <Card>
@@ -129,7 +128,7 @@ export const LessonList: React.FC<{
       </h3>
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map(l=>l.id)} strategy={verticalListSortingStrategy}>
- {items.map((lesson, index) => (
+ {lessons.map((lesson, index) => (
         <SortableLessonCard key={lesson.id} lesson={lesson} index={index} onEdit={onEditLesson} onDelete={onDeleteLesson} />
       ))}
         </SortableContext>
