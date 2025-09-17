@@ -14,7 +14,7 @@ export const fetchYouTubeDetails = async (
     const video = data.items[0];
     const snippet = video.snippet;
     const contentDetails = video.contentDetails;
-    const thumbnail = snippet.thumbnails.default.url;
+    const thumbnail = snippet.thumbnails?.medium?.url;
     return {
       title: snippet.title,
       description: snippet.description,
@@ -23,7 +23,7 @@ export const fetchYouTubeDetails = async (
     };
   } catch (error) {
     console.error("Error fetching YouTube video details:", error);
-    return null;
+    throw error;
   }
 };
 
@@ -50,11 +50,10 @@ export const fetchPlaylistVideo = async (
         };
       })
     );
-
     return videos;
   } catch (err) {
     console.error("Failed to fetch playlist", err);
-    return null;
+    throw err;
   }
 };
 

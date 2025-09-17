@@ -96,15 +96,14 @@ export const postCourse = async (
       res.status(400).json({ error: "User does not exist" });
       return;
     }
-    console.log(req.body);
+   
 
     const validateData = courseSchema.safeParse(req.body);
     if (!validateData.success) {
       res.status(400).json({ error: validateData.error.errors });
       return;
     }
-    // console.log("hello")
-    // console.log(req.body)
+
 
     const { title, description, coverImg } = validateData.data;
     const { lessons } = req.body;
@@ -133,11 +132,19 @@ export const postCourse = async (
     const activeLessonId = course.lessons.filter((i: any) => i.order === 1)[0].id;
    const updatedCourse = await prisma.course.update({
       where: { id: course.id },
-      data: { activeLessonId: activeLessonId },
+      data: { activeLessonId: activeLessonId,},
+      include: { lessons: true, user: true },
     });
+    // const formatedResponse={
+    //   ...updateCourse,
+    //     duration: course.totalDuration,
+    //   numberOfLesson: course.lessons.length,
+    //   completedLesson: course.lessons.filter((l) => l.status === "COMPLETED")
+    //     .length,
+    // }
     res.status(201).json({
       message: "Course Created Successfully",
-      updatedCourse,
+      data:updatedCourse,
     });
   } catch (error) {
     console.error("Error while creating course:", error);
@@ -151,11 +158,14 @@ export const updateCourse: RequestHandler = async (
   res: Response
 ): Promise<void> => {
   try {
+    console.log("log1")
     const { id } = req.params;
-    const userId = 1;
-
+    const authReq = req as AuthenticatedRequest;
+    const userId = authReq.user?.id;
+    
     if (!userId) {
       res.status(401).json({ error: "Unauthorised access: user Id not found" });
+      console.log("log2")
       return;
     }
 
@@ -163,39 +173,121 @@ export const updateCourse: RequestHandler = async (
 
     if (!userExists) {
       res.status(400).json({ error: "User does not exist" });
+      console.log("log3")
       return;
     }
 
-    // Check if course exists
+    // Check if course exists and belongs to the user
     const existingCourse = await prisma.course.findFirst({
-      where: { id },
+      where: { 
+        id,
+        userId // Ensure user owns the course
+      },
+      include: {
+        lessons: true
+      }
     });
+    console.log(existingCourse)
 
     if (!existingCourse) {
-      res.status(404).json({ error: "Course not found" });
+      res.status(404).json({ error: "Course not found or you don't have permission to update it" });
       return;
     }
 
     const validateData = courseSchema.safeParse(req.body);
+    console.log({validateData})
+    
     if (!validateData.success) {
       res.status(400).json({ error: validateData.error.errors });
       return;
     }
 
     const { title, description, coverImg } = validateData.data;
+    const { lessons } = req.body;
 
-    const updatedCourse = await prisma.course.update({
-      where: { id },
-      data: {
-        title,
-        description,
-        coverImg,
-      },
+    // Start a transaction to ensure data consistency
+    const result = await prisma.$transaction(async (tx) => {
+      // Update course basic info
+      const updatedCourse = await tx.course.update({
+        where: { id },
+        data: {
+          title,
+          description,
+          coverImg,
+        },
+      });
+
+      // Handle lessons if provided
+      if (lessons && Array.isArray(lessons)) {
+        // Delete existing lessons
+        await tx.lesson.deleteMany({
+          where: { courseId: id }
+        });
+
+        // Create new lessons
+        await tx.lesson.createMany({
+          data: lessons.map((lesson: any) => ({
+            title: lesson.title,
+            description: lesson.description,
+            videoId: lesson.videoId,
+            thumbnail: lesson.thumbnail,
+            duration: lesson.duration,
+            order: lesson.order,
+            status: lesson.status || "NA",
+            courseId: id
+          }))
+        });
+
+        // Calculate total duration with new lessons
+        const totalDuration = calculateTotalDuration(lessons);
+        
+        // Get the first lesson (order = 1) for activeLessonId
+        const firstLesson = lessons.find((lesson: any) => lesson.order === 1);
+        const activeLessonId = firstLesson ? 
+          (await tx.lesson.findFirst({
+            where: { courseId: id, order: 1 }
+          }))?.id : existingCourse.activeLessonId;
+
+        // Update course with new total duration and active lesson
+        const finalUpdatedCourse = await tx.course.update({
+          where: { id },
+          data: { 
+            totalDuration,
+            activeLessonId
+          },
+          include: {
+            lessons: true,
+            user: true
+          }
+        });
+
+        return finalUpdatedCourse;
+      } else {
+        // If no lessons provided, just recalculate duration with existing lessons
+        const existingLessons = await tx.lesson.findMany({
+          where: { courseId: id }
+        });
+        
+        const totalDuration = calculateTotalDuration(existingLessons);
+        
+        const finalUpdatedCourse = await tx.course.update({
+          where: { id },
+          data: { totalDuration },
+          include: {
+            lessons: true,
+            user: true
+          }
+        });
+
+        return finalUpdatedCourse;
+      }
     });
 
+    console.log(result);
+    
     res.status(200).json({
       message: "Course Updated Successfully",
-      course: updatedCourse,
+      data: result,
     });
   } catch (error) {
     console.error("Error while updating course:", error);
@@ -209,7 +301,8 @@ export const deleteCourse: RequestHandler = async (
 ): Promise<void> => {
   try {
     const { id } = req.params;
-    const userId = 1;
+    const authReq = req as AuthenticatedRequest;
+    const userId = authReq.user?.id;
 
     if (!userId) {
       res.status(401).json({ error: "Unauthorised access: user Id not found" });

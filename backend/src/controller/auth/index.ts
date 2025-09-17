@@ -47,6 +47,16 @@ class AuthController{
 
         }
     }
+    public refreshToken = async (req: Request, res: Response): Promise<void> => {
+        try {
+            await authService.refreshToken(req, res);
+        } catch (error) {
+            console.error(error);
+            if (!res.headersSent) {
+                res.status(500).json({ error: "Something went wrong!" });
+            }
+        }
+    }
 }
 
 export const authController = AuthController.getInstance();

@@ -1,181 +1,178 @@
-import React from 'react';
-import { Card } from '@/components/ui/card'
-import { 
+import React from "react";
+import { Card } from "@/components/ui/card";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 
-import { Button } from '@/components/ui/button';
-import {  Clock, BookOpen, ArrowRight, MoreVertical, Edit, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Button } from "@/components/ui/button";
+import {
+  Clock,
+  BookOpen,
+  ArrowRight,
+  MoreVertical,
+  Edit,
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { DeleteCourseButton } from "./DeleteCourseButton";
 // Types
-type courseList={
-    id:string;
-    title:string;
-    description:string;
-    coverImg:string;
-    duration:string;
-    activeLessonId:string;
-    numberOfLesson:number;
-    completedLesson:number;
-}
+type courseList = {
+  id: string;
+  title: string;
+  description: string;
+  coverImg: string;
+  duration: string;
+  activeLessonId: string;
+  numberOfLesson: number;
+  completedLesson: number;
+};
+
 // Course Card Component
 interface CourseCardProps {
   course: courseList;
-  // onAction: (courseId: string) => void;
-  // onEdit: (courseId: string) => void;
   onDelete: (courseId: string) => void;
+  onEdit: (courseId: string) => void;
 }
 
-export const CourseCard: React.FC<CourseCardProps> = ({ course,onDelete}) => {
-  // const onDelete=async(courseId:string)=>{
-  //   if(!window.confirm("Are you sure you want to delete this course?"))
-  //     return;
-  //  const response=await deleteCourseApi(courseId);
-  //  if(response.status===200)
-  //  {
-  //    window.location.reload();
-  //  }
-  // }
-  const progressPercentage = Math.round((course.completedLesson / course.numberOfLesson) * 100);
+export const CourseCard: React.FC<CourseCardProps> = ({
+  course,
+  onDelete,
+  onEdit,
+}) => {
+  const progressPercentage = Math.round(
+    (course.completedLesson / course.numberOfLesson) * 100
+  );
   const isStarted = course.completedLesson > 0;
-  const defaultImage = "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=240&fit=crop&crop=center";
-const navigate=useNavigate();
+  const defaultImage =
+    "https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=400&h=240&fit=crop&crop=center";
+  const navigate = useNavigate();
+
   return (
-    <Card 
-      className="group overflow-hidden transition-all duration-300 hover:shadow-lg hover:-translate-y-0.5 cursor-pointer  border-r-2 border-slate-400 bg-white  w-full dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 "
-   onClick={()=>(navigate(`/learn/${course.id}?lesson=${course.activeLessonId}`))} >
-      <div className="flex h-32">
-        {/* Image Section - Left Side */}
-        <div 
-          className="relative w-52 flex-shrink-0 bg-cover bg-center overflow-hidden"
-          style={{ 
-            backgroundImage: `url(${course.coverImg || defaultImage})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center'
-          }}
-        >
-          {/* Subtle gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-br from-transparent via-black/10 to-black/30"></div>
+    <Card
+      className="group overflow-hidden transition-all duration-300 hover:shadow-md cursor-pointer border border-gray-200 bg-white w-full max-w-72 dark:bg-gray-950 dark:border-gray-800"
+      onClick={() =>
+        navigate(`/learn/${course.id}?lesson=${course.activeLessonId}`)
+      }
+    >
+      {/* Image Section - Top */}
+      <div
+        className="relative h-32 bg-cover bg-center overflow-hidden"
+        style={{
+          backgroundImage: `url(${course.coverImg || defaultImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+        }}
+      >
+        {/* Status Badge */}
+        <div className="absolute top-2 left-2">
+          <span
+            className={`text-xs px-1.5 py-0.5 rounded font-medium ${
+              isStarted
+                ? "bg-green-100 text-green-700"
+                : "bg-blue-100 text-blue-700"
+            }`}
+          >
+            {isStarted ? "Progress" : "New"}
+          </span>
         </div>
 
-        {/* Content Section - Right Side */}
-        <div className="flex-1 p-4 flex flex-col justify-between">
-          {/* Top Section - Title and Description */}
-          <div className="space-y-2">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900 leading-tight line-clamp-1 group-hover transition-colors dark:text-amber-50">
-                {course.title}
-              </h3>
-              <div className="flex items-center space-x-2">
-                <span className={`text-xs px-2 py-1 rounded-md font-mono font-medium border ${
-                  isStarted 
-                    ? 'bg-green-50 text-green-700 border-green-200' 
-                    : 'bg-blue-50 text-blue-700 border-blue-200'
-                }`}>
-                  {isStarted ? 'IN_PROGRESS' : 'READY_TO_START'}
-                </span>
-                
-                {/* More Options Dropdown */}
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="sm"
-                      className="h-8 w-8 p-0 opacity-0 group-hover:opacity-100 transition-opacity"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <MoreVertical className="h-4 w-4" />
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align="end" className="w-48">
-                    <DropdownMenuItem 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        // onEdit(course.id);
-                      }}
-                      className="cursor-pointer"
-                    >
-                      <Edit className="mr-2 h-4 w-4" />
-                      Edit Course
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem 
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        onDelete(course.id);
-                      }}
-                      className="cursor-pointer text-red-600 focus:text-red-600"
-                    >
-                      <Trash2 className="mr-2 h-4 w-4" />
-                      Delete Course
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 line-clamp-2 leading-relaxed dark:text-gray-300">
-              {course.description}
-            </p>
-          </div>
-
-          {/* Bottom Section - Stats, Progress, and Action */}
-          <div className="space-y-2">
-            {/* Course Stats and Action */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                <div className="flex items-center space-x-1">
-                  <BookOpen className="w-4 h-4" />
-                  <span className="font-mono">{course.numberOfLesson}</span>
-                  <span>lessons</span>
-                </div>
-                <div className="flex items-center space-x-1 text-primary bg-blue-100 border rounded-lg p-1">
-                  <Clock className="w-4 h-4" />
-                  <span className="font-mono">{course.duration}</span>
-                  {/* <span>total</span> */}
-                </div>
-              </div>
-              
+        {/* More Options Dropdown */}
+        <div className="absolute top-2 right-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
               <Button
+                variant="ghost"
+                size="sm"
+                className="h-6 w-6 p-0 bg-white/80 hover:bg-white opacity-0 group-hover:opacity-100 transition-opacity"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <MoreVertical className="h-3 w-3 text-gray-700" />
+              </Button>
+            </DropdownMenuTrigger>
+
+            <DropdownMenuContent align="end" className="w-40">
+              <DropdownMenuItem
                 onClick={(e) => {
                   e.stopPropagation();
-                  navigate(`/learn/${course.id}`)
-                  // onAction(course.id);
+                  onEdit(course.id);
                 }}
-                className="inline-flex items-center space-x-1 px-3 py-1.5 bg-gray-900 text-white text-sm font-medium rounded-lg hover:bg-gray-800 transition-all duration-200 hover:scale-105 active:scale-95 dark:bg-gray-100 dark:text-gray-900 dark:hover:bg-gray-200"
+                className="cursor-pointer text-xs"
               >
-                <span>{isStarted ? 'Continue' : 'Start'}</span>
-                <ArrowRight className="w-3 h-3" />
-              </Button>
-            </div>
+                <Edit className="mr-2 h-3 w-3" />
+                Edit
+              </DropdownMenuItem>
 
-            {/* Progress Bar - Only if started */}
-            {isStarted && (
-              <div className="flex items-center space-x-2">
-                <span className="text-xs text-gray-500 font-medium dark:text-gray-400">
-                  Progress:
-                </span>
-                <div className="flex items-center space-x-2 flex-1">
-                  <div className="relative flex-1 max-w-24 bg-gray-300 rounded-sm h-1 overflow-hidden dark:bg-gray-700">
-                    <div 
-                      className="h-full bg-gray-900 transition-all duration-300 ease-out"
-                      style={{ width: `${progressPercentage}%` }}
-                    ></div>
-                    <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-pulse"></div>
-                  </div>
-                  <span className="text-xs text-gray-600 font-mono tabular-nums dark:text-gray-300">
-                    {course.completedLesson}/{course.numberOfLesson}
-                  </span>
-                </div>
+              <DropdownMenuSeparator />
+
+              {/* Delete Confirmation */}
+              <div
+                onClick={(e) => e.stopPropagation()} // prevent parent click
+                className="px-2"
+              >
+                <DeleteCourseButton onConfirm={() => onDelete(course.id)} />
               </div>
-            )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+
+      {/* Content Section - Bottom */}
+      <div className="p-3 space-y-2">
+        {/* Title */}
+        <h3 className="text-base font-bold text-gray-900 leading-tight line-clamp-2 group-hover:text-blue-600 transition-colors dark:text-white dark:group-hover:text-blue-400">
+          {course.title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed dark:text-gray-300">
+          {course.description}
+        </p>
+
+        {/* Course Stats */}
+        <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+          <div className="flex items-center space-x-1">
+            <BookOpen className="w-3 h-3" />
+            <span>{course.numberOfLesson} lessons</span>
+          </div>
+          <div className="flex items-center space-x-1">
+            <Clock className="w-3 h-3" />
+            <span>{course.duration}</span>
           </div>
         </div>
+
+        {/* Progress Bar - Only if started */}
+        {isStarted && (
+          <div className="space-y-1">
+            <div className="flex items-center justify-between text-xs">
+              <span className="text-gray-500 dark:text-gray-400">Progress</span>
+              <span className="text-gray-600 font-mono dark:text-gray-300">
+                {progressPercentage}%
+              </span>
+            </div>
+            <div className="relative w-full bg-gray-200 rounded-full h-1.5 overflow-hidden dark:bg-gray-700">
+              <div
+                className="h-full bg-gradient-to-r from-blue-500 to-blue-600 rounded-full transition-all duration-300"
+                style={{ width: `${progressPercentage}%` }}
+              ></div>
+            </div>
+          </div>
+        )}
+
+        {/* Action Button */}
+        <Button
+          onClick={(e) => {
+            e.stopPropagation();
+            navigate(`/learn/${course.id}`);
+          }}
+          className="w-full inline-flex items-center justify-center space-x-1 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 transition-all duration-200 dark:bg-blue-600 dark:hover:bg-blue-700"
+        >
+          <span>{isStarted ? "Continue" : "Start"}</span>
+          <ArrowRight className="w-3 h-3" />
+        </Button>
       </div>
     </Card>
   );
 };
-

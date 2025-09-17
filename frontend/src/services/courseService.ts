@@ -33,14 +33,15 @@ export const getCourseByIdApi = async (courseId: string) => {
     }
  }
 
-export const updateCourseApi = async (courseId: string, course: Course) => {
-    try {
-        await api.put(`${BACKEND_BASE_URL}/course/${courseId}`, course);
-    } catch (error) {
-        console.error("Error updating course:", error);
-        throw error; 
-    }
-}
+export const updateCourseApi = async (course: Course): Promise<{message: string, data: any}> => {
+  try {
+    const response = await api.put(`/course/${course.id}`, course);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating course:', error);
+    throw error;
+  }
+};
 
 export const deleteCourseApi = async (courseId: string) => {
     try {

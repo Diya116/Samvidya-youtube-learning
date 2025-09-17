@@ -3,10 +3,11 @@ import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import {
   ArrowLeft,
   BookOpen,
-  FileText,
+ // FileText,
   ChevronLeft,
   AlignJustify,
   Notebook,
+  User,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,22 +16,42 @@ import {
   ResizableHandle,
 } from "@/components/ui/resizable";
 import LessonList from "@/components/Learning/lessons/LessonList";
-import NoteTaking from "@/components/Learning/NoteTaking";
-import VideoPlayer from "@/components/Learning/VideoPlayer";
+import NoteTaking from "@/components/Learning/Note/NoteTaking";
+import VideoPlayer from "@/components/Learning/VideoPlayer/VideoPlayer";
 import { getCourseByIdApi } from "@/services/courseService";
 import { api } from "@/utils/axiosInstance";
 import type { Course } from "@/types/course";
 import Loader from "@/components/Loader";
+import NotesList from "@/components/Learning/Note/NotesList";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 type CourseResponse = Course & {
   activeLessonId: string;
 };
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+  //DialogDescription,
+} from "@/components/ui/dialog";
 const Learning: React.FC = () => {
   const [course, setCourse] = useState<CourseResponse | null>(null);
   const [currentLessonId, setCurrentLessonId] = useState<string>("");
-  const [isLessonsOpen, setIsLessonsOpen] = useState(true);
-  const [isNotesOpen, setIsNotesOpen] = useState(false);
+  const [isLessonsOpen, setIsLessonsOpen] = useState(false);
+  const [isNotesOpen, setIsNotesOpen] = useState<Boolean>(false);
   const [searchParams, setSearchParams] = useSearchParams();
-
+  const [isOpen, setIsOpen] = useState(false);
+  const [noteId, setNoteId] = useState<string | null>(null);
+  const [note, setNote] = useState<{ title: string; content: string }>({
+    title: "",
+    content: "",
+  });
   const { id } = useParams();
   const navigate = useNavigate();
 
@@ -42,9 +63,10 @@ const Learning: React.FC = () => {
         setCurrentLessonId(
           searchParams.get("lesson") || response.activeLessonId
         );
+        localStorage.setItem("lastLearningUrl", window.location.href);
       } catch (error) {
         console.error("Error fetching course details:", error);
-        navigate("/workspace");
+        navigate("/Course");
       }
     };
     if (id) getCourseDetail(id);
@@ -76,31 +98,29 @@ const Learning: React.FC = () => {
   const CurrentLesson = (videoId: string) => {
     setCurrentLessonId(videoId);
   };
-const onReorderLessons=async(lessons:any)=>{
-  try{
-    const data=lessons.map((lesson:any)=>({
-      id: lesson.id,
-      order: lesson.order}))
-      console.log("i have sended this",data);
-    await api.put(`/course/${course?.id}/reorder`,{data})
-  }
-  catch(error)
-  {
-    console.error("Error reordering lessons:", error);
-  }
-}
-const onUpdateStatusOfLesson = async (lessonId: string, status: string) => {
-  try{
-    await api.put(`/course/${course?.id}/lesson/status`, {
-      lessonId,
-      status,
-    });
-    console.log("Lesson status updated successfully");
-  }
-  catch(error) {
-    console.error("Error updating lesson status:", error);
-  }
-}
+  const onReorderLessons = async (lessons: any) => {
+    try {
+      const data = lessons.map((lesson: any) => ({
+        id: lesson.id,
+        order: lesson.order,
+      }));
+      console.log("i have sended this", data);
+      await api.put(`/course/${course?.id}/reorder`, { data });
+    } catch (error) {
+      console.error("Error reordering lessons:", error);
+    }
+  };
+  const onUpdateStatusOfLesson = async (lessonId: string, status: string) => {
+    try {
+      await api.put(`/course/${course?.id}/lesson/status`, {
+        lessonId,
+        status,
+      });
+      console.log("Lesson status updated successfully");
+    } catch (error) {
+      console.error("Error updating lesson status:", error);
+    }
+  };
   return (
     <div>
       {!course ? (
@@ -109,21 +129,102 @@ const onUpdateStatusOfLesson = async (lessonId: string, status: string) => {
         <div className="h-screen bg-background overflow-y-hidden">
           {/* Header */}
           <div className="border-b">
-            <div className="flex items-center justify-between py-2 px-4">
+            <div className="flex items-center justify-between py-1 px-4">
               <ArrowLeft
                 className="h-6 w-6 cursor-pointer"
-                onClick={() => navigate("/workspace")}
+                onClick={() => navigate("/workspace/courses")}
               />
-              <h1 className="text-lg">{course?.title}</h1>
-              <div
-                className="flex gap-2 text-gray-600 bg-gray-100 p-1 border border-gray-600 cursor-pointer"
-                onClick={() => {
-                  setIsNotesOpen(true);
-                  searchParams.set("tab", "notes");
-                  setSearchParams(searchParams);
-                }}
-              >
-                <Notebook /> Notes
+              <h1 className="text-lg ">{course?.title}</h1>
+              <div className="flex items-center gap-5">
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <button
+                      title="take notes"
+                      className="flex gap-2 text-gray-600 cursor-pointer"
+                    >
+                      <Notebook className="h-6 w-6 cursor-pointer" />
+                    </button>
+                  </DropdownMenuTrigger>
+
+                  <DropdownMenuContent className="m-2">
+                    {/* New Note */}
+                    <DropdownMenuItem
+                      onClick={() => {
+                        setIsNotesOpen(true);
+                        searchParams.set("tab", "notes");
+                        setSearchParams(searchParams);
+                        setNoteId(null);
+                      }}
+                      className="border border-gray-300"
+                    >
+                      New Note
+                    </DropdownMenuItem>
+
+                    {/* Create Learning Path */}
+                    <DropdownMenuItem asChild onClick={() => {}}>
+                      <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                        <DialogTrigger asChild>
+                          <button className="flex items-center w-full cursor-pointer dark:text-white">
+                            select from existing notes
+                          </button>
+                        </DialogTrigger>
+
+                        <DialogContent
+                          className="!max-w-none w-[50vw] max-h-[90vh] overflow-y-auto 
+               top-10 translate-y-0 left-1/2 -translate-x-1/2"
+                        >
+                          <DialogHeader>
+                            <DialogTitle>Select From this Notes</DialogTitle>
+                          </DialogHeader>
+                          <div>
+                            <NotesList
+                              setNoteId={setNoteId}
+                              setIsOpen={setIsOpen}
+                              setIsNotesOpen={setIsNotesOpen}
+                            />
+                          </div>
+                        </DialogContent>
+                      </Dialog>
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+
+                {/* <div>
+                  <button
+                    title="take notes"
+                    className="flex gap-2 text-gray-600 cursor-pointer"
+                    onClick={() => {
+                      setIsNotesOpen(!isNotesOpen);
+                      searchParams.set("tab", "notes");
+                      setSearchParams(searchParams);
+                    }}
+                  >
+                    <Notebook className="h-6 w-6 cursor-pointer" />
+                  </button>
+                </div> */}
+                {/* <div className="flex">
+                  <button title="set pomodoro" className="">
+                    <Timer className="h-6 w-6 cursor-pointer text-primary" />
+                  </button>
+                </div> */}
+                {/* <div className="flex">
+                  <button title="your current streak">
+                    {" "}
+                    <Flame className="h-6 w-6 cursor-pointer text-gray-600" />{" "}
+                  </button>
+                  <span>0 </span>
+                </div> */}
+                <div>
+                  <button
+                    title="profile"
+                    className=" text-gray-600 cursor-pointer border border-gray-300 rounded-full p-1"
+                    onClick={() => {
+                      navigate("/profile");
+                    }}
+                  >
+                    <User className="h-5 w-5 cursor-pointer" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -131,7 +232,7 @@ const onUpdateStatusOfLesson = async (lessonId: string, status: string) => {
           <div className="flex h-[calc(100vh-48px)]">
             {/* Lesson List Toggle */}
             {isLessonsOpen && (
-              <div className="border-r bg-card h-full w-[300px] resize-x ">
+              <div className="border-r bg-card h-full w-[350px] resize-x ">
                 <div className="flex justify-between items-center p-2 border-b">
                   <h2 className="flex items-center gap-2">
                     <BookOpen className="h-4 w-4" /> Lessons
@@ -187,32 +288,24 @@ const onUpdateStatusOfLesson = async (lessonId: string, status: string) => {
                 </ResizablePanel>
 
                 {/* Notes Panel */}
-                {isNotesOpen && (
+                {isNotesOpen ? (
                   <>
                     <ResizableHandle withHandle />
-                    <ResizablePanel minSize={20} maxSize={50}>
+                    <ResizablePanel minSize={45} maxSize={50}>
                       <div className="h-full border-l bg-card flex flex-col">
-                        <div className="p-4 border-b flex items-center justify-between">
-                          <h2 className="font-semibold flex items-center gap-2">
-                            <FileText className="h-4 w-4 text-secondary" />{" "}
-                            Notes
-                          </h2>
-                          <Button
-                            size="icon"
-                            variant="ghost"
-                            onClick={() => {
-                              setIsNotesOpen(false);
-                              searchParams.delete("tab");
-                              setSearchParams(searchParams);
-                            }}
-                          >
-                            <ChevronLeft />
-                          </Button>
-                        </div>
-                        <NoteTaking />
+                        <NoteTaking
+                          note={note}
+                          setNote={setNote}
+                          lessonId={currentLessonId}
+                          noteId={noteId}
+                          setNoteId={setNoteId}
+                          setIsNotesOpen={setIsNotesOpen}
+                        />
                       </div>
                     </ResizablePanel>
                   </>
+                ) : (
+                  <></>
                 )}
               </ResizablePanelGroup>
             </div>

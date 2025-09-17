@@ -21,7 +21,7 @@ const {theme,toggleTheme}=useTheme();
 const {  logout } = useAuth();
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b  backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 display flex justify-center">
+    <header className="sticky top-0 z-50 w-full   backdrop-blur supports-[backdrop-filter]:bg-white/60 dark:bg-gray-950/95 dark:supports-[backdrop-filter]:bg-gray-950/60 display flex justify-center">
       <div className="  container flex h-16 items-center justify-between px-6">
         {/* Logo Section */}
         <div className="flex items-center">

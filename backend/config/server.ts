@@ -8,6 +8,7 @@ import morgan from "morgan";
 //sets http headers for security
 import helmet from "helmet";
 //allows cross-origin resource sharing 
+import CookieParser from "cookie-parser"
 import cors from "cors";
 import {setupSwagger} from "../swagger"
 import routes from "../src/routes/index.routes";
@@ -84,6 +85,7 @@ export default (app: express.Application) => {
   app.use(helmet());
   app.use(compression());
   app.use(express.static("public"));
+  app.use(CookieParser());
   app.disable("x-powered-by");
   // app.disable("etag");
   app.use(api, routes);
