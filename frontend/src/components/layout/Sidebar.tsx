@@ -1,4 +1,4 @@
-import {  LayoutDashboard, GraduationCap, Settings, NotebookPen, User } from "lucide-react";
+import {   GraduationCap, Settings, NotebookPen } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
 function NavbarNew() {
@@ -12,10 +12,10 @@ function NavbarNew() {
 
   // Navigation items array for easier management
   const navigationItems = [
-    { path: "/workspace", icon: LayoutDashboard, label: "Dashboard" },
+    // { path: "/workspace", icon: LayoutDashboard, label: "Dashboard" },
     { path: "/workspace/courses", icon: GraduationCap, label: "Courses" },
     { path: "/workspace/notes", icon: NotebookPen, label: "Notes" },
-    { path: "/workspace/profile", icon: User, label: "Profile" },
+    // { path: "/workspace/profile", icon: User, label: "Profile" },
     { path: "/workspace/setting", icon: Settings, label: "Settings" }
   ];
 

@@ -27,14 +27,15 @@ export const createNote = async (req: Request, res: Response) => {
     }
 
     const validateData = noteSchema.safeParse(req.body);
+    console.log("data",req.body);
     if (!validateData.success) {
        res.status(400).json({ error: validateData.error.errors });
        return;
     }
 
-    const { title, content, lessonId } = validateData.data;
+    const { title, content, courseId } = validateData.data;
     const note = await prisma.note.create({
-      data: { title, content, userId, ...(lessonId !== undefined && { lessonId }) },
+      data: { title, content, userId, ...(courseId !== undefined && { courseId }) },
     });
 
      res.status(201).json({ message: "Note created successfully", note });
@@ -90,20 +91,20 @@ export const getSingleNoteById = async (req: Request, res: Response) => {
   }
 };
 
-export const getNotesByLesson = async (req: Request, res: Response) => {
+export const getNotesByCourse = async (req: Request, res: Response) => {
   try {
     const authReq = req as AuthenticatedRequest;
     const userId = authReq.user?.id;
-    const lessonId = req.params.lessonId;
-console.log(lessonId)
+    const courseId = req.params.courseId;
+console.log({courseId})
     if (!userId) {
       res.status(401).json({ error: "Unauthorized access" });
       return;
     }
 
-    const notes = await prisma.note.findMany({ where: { userId, lessonId } });
+    const notes = await prisma.note.findMany({ where: { userId, courseId } });
     console.log(notes)
-     res.status(200).json({ notes:notes[0] });
+     res.status(200).json({ notes:notes });
      return;
   } catch (error) {
     console.error("Error while fetching notes by lesson:", error);

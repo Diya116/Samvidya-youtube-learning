@@ -1,10 +1,12 @@
 generator client {
   provider = "prisma-client-js"
 }
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
@@ -14,18 +16,20 @@ model User {
   courses   Course[]
   notes     Note[]
 }
+
 model Course {
-  id          String   @id @default(cuid())
-  title       String
-  description String?
-  coverImg    String?
-  userId      Int
-  lessons     Lesson[] 
+  id             String   @id @default(cuid())
+  title          String
+  description    String?
+  coverImg       String?
+  userId         Int
+  lessons        Lesson[]
   activeLessonId String?
-  totalDuration String?
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  totalDuration  String?
+  user           User     @relation(fields: [userId], references: [id])
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  Note           Note[]
 }
 
 model Lesson {
@@ -36,23 +40,24 @@ model Lesson {
   thumbnail   String?
   duration    String
   order       Int
-  status      String 
+  status      String
   courseId    String
-  course      Course   @relation(fields: [courseId], references: [id],onDelete:Cascade)
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
   notes       Note[]
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
 
 model Note {
-  id       String  @id @default(cuid())
-  title    String
-  content  String
-  lessonId String?
-  userId   Int
-  lesson   Lesson?  @relation(fields: [lessonId], references: [id])
-  user        User     @relation(fields: [userId], references: [id])
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  courseId  String?
+  userId    Int
+  course    Course?   @relation(fields: [courseId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  Lesson    Lesson?  @relation(fields: [lessonId], references: [id])
+  lessonId  String?
 }
-
