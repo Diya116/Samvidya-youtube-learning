@@ -1,10 +1,10 @@
-import { useState ,useEffect} from "react";
+import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
 //schema and type
 import { signupSchema } from "../schema";
-import type { SignupForm} from "@/types/auth";
+import type { SignupForm } from "@/types/auth";
 
 //API service
 //import { signupUserapi } from "@/services/authService";
@@ -17,10 +17,9 @@ import { Label } from "@/components/ui/label";
 import { CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
-
-const Signup= () => {
+const Signup = () => {
   const navigate = useNavigate();
-  const {signup}=useAuth();
+  const { signup } = useAuth();
   const [formData, setFormData] = useState<SignupForm>({
     name: "",
     email: "",
@@ -38,7 +37,7 @@ const Signup= () => {
     }
   }, [error]);
 
-const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
@@ -48,14 +47,18 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
   const handleSubmit = async (): Promise<void> => {
     //1)email and password both required
-    if(formData.name.trim() === "" ||formData.email.trim() === "" || formData.password.trim() === "") {
-      setError("name,Email,password both required" );  
+    if (
+      formData.name.trim() === "" ||
+      formData.email.trim() === "" ||
+      formData.password.trim() === ""
+    ) {
+      setError("name,Email,password both required");
       return;
     }
     //2)validate data using zod schema
     const validateData = signupSchema.safeParse(formData);
     if (!validateData.success) {
-      setError(validateData.error.errors[0].message);   
+      setError(validateData.error.errors[0].message);
       return;
     }
     try {
@@ -64,37 +67,30 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       await signup(formData);
       setIsLoading(false);
       // if (!response.success) {
-      //   setError(response.error);    
+      //   setError(response.error);
       //   return;
       // }
       toast.success("Signup successful");
-      navigate("/workspace");  
-
+      navigate("/workspace/courses");
     } catch (error) {
       console.error("Error during login:", error);
       alert("An error occurred during login. Please try again later.");
     }
   };
-   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
-    if (e.key === 'Enter') {
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
+    if (e.key === "Enter") {
       handleSubmit();
     }
   };
-  const {isAuthenticated}=useAuth();
+  const { isAuthenticated } = useAuth();
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
-      {
-  isAuthenticated() && (
-   <Navigate to="/workspace" replace />
-  )
-}
+    <div className="min-h-screen flex items-center justify-center p-4">
+      {isAuthenticated() && <Navigate to="/workspace/courses" replace />}
       <div className="w-full max-w-md">
         <Card className="w-full">
           <CardHeader>
             <CardTitle>Welcome to Samvidya</CardTitle>
-            <CardDescription>
-              Create new account to continue
-            </CardDescription>
+            <CardDescription>Create new account to continue</CardDescription>
           </CardHeader>
           <CardContent>
             {error && (
@@ -106,8 +102,10 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
             )}
 
             <div className="space-y-4">
-                 <div>
-                <Label htmlFor="email" className="mb-2">name <span className="text-red-600">*</span></Label>
+              <div>
+                <Label htmlFor="email" className="mb-2">
+                  name <span className="text-red-600">*</span>
+                </Label>
                 <Input
                   id="name"
                   name="name"
@@ -119,7 +117,9 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               </div>
 
               <div>
-                <Label htmlFor="email" className="mb-2">Email <span className="text-red-600">*</span></Label>
+                <Label htmlFor="email" className="mb-2">
+                  Email <span className="text-red-600">*</span>
+                </Label>
                 <Input
                   id="email"
                   name="email"
@@ -131,7 +131,9 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               </div>
 
               <div>
-                <Label htmlFor="password" className="mb-2">Password</Label>
+                <Label htmlFor="password" className="mb-2">
+                  Password
+                </Label>
                 <Input
                   id="password"
                   name="password"
@@ -145,7 +147,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
               <Button
                 type="button"
-                className="w-full"
+                className="w-full text-white"
                 disabled={isLoading}
                 onClick={handleSubmit}
               >
