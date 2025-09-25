@@ -1,14 +1,21 @@
 import React, { useEffect, useState } from "react";
+
 import { Button } from "@/components/ui/button";
+import Loader from "@/components/Loader";
+
 import type { Course } from "@/types/course";
 import type { Lesson } from "@/types/lesson";
-import LessonForm from "../../Lesson/LessonForm";
+
 import { getCourseByIdApi } from "@/services/courseService";
 import { courseSchema } from "@/validation/course-schema";
+
 import { useCourseLessons } from "@/hooks/useCourseLesson";
+
+import LessonForm from "../../Lesson/LessonForm";
 import { CourseFormFields } from "./CourseFormFields";
 import { CourseLessonSection } from "./CourseLessonSection";
-import Loader from "@/components/Loader";
+
+
 interface CourseFormProps {
   onSubmit: (course: Course) => void;
   editingCourseId?: string;

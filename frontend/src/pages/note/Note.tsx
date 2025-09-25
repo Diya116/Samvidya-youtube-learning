@@ -6,7 +6,7 @@ function Note() {
     const {id}=useParams();
 const[note,setNote]=useState({
     title:"",
-    content:""
+    content:"",
 });
 const [noteId,setNoteId]=useState<string|null>(null);
     useEffect(()=>{

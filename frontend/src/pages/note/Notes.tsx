@@ -18,7 +18,7 @@ function Notes() {
         {/* <NavbarNew/> */}
         
       <div className='flex justify-center'>
-        <input placeholder="search notes...." className="border border-primary rounded-lg p-2 px-4 w-3xl outline-1 outline-primary ml-2"/>
+        {/* <input placeholder="search notes...." className="border border-primary rounded-lg p-2 px-4 w-3xl outline-1 outline-primary ml-2"/> */}
       </div>
       <div className="flex-1 overflow-y-auto ">
       { 
