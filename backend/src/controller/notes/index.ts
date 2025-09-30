@@ -49,19 +49,35 @@ export const getAllNotesOfUser = async (req: Request, res: Response) => {
   try {
     const authReq = req as AuthenticatedRequest;
     const userId = authReq.user?.id;
-
+    
     if (!userId) {
-       res.status(401).json({ error: "Unauthorized access: user Id not found" });
-       return;
+      res.status(401).json({ error: "Unauthorized access: user Id not found" });
+      return;
     }
-
-    const notes = await prisma.note.findMany({ where: { userId } });
+    
+    // Include course information to get course names
+    const notes = await prisma.note.findMany({ 
+      where: { userId },
+      include: {
+        course: {
+          select: {
+            id: true,
+            title: true, // or whatever field contains the course name
+             // include this if your course model uses 'name' instead of 'title'
+          }
+        }
+      },
+      orderBy: {
+        updatedAt: 'desc' // Optional: order by most recently updated
+      }
+    });
+    
     res.status(200).json({ notes });
     return;
   } catch (error) {
     console.error("Error while fetching notes:", error);
-     res.status(500).json({ error: "Internal Server Error" });
-     return;
+    res.status(500).json({ error: "Internal Server Error" });
+    return;
   }
 };
 
@@ -159,19 +175,23 @@ export const deleteNote = async (req: Request, res: Response) => {
     const noteId = req.params.id;
 
     if (!userId) {
-      return res.status(401).json({ error: "Unauthorized access" });
+       res.status(401).json({ error: "Unauthorized access" });
+       return;
     }
 
     const existingNote = await prisma.note.findFirst({ where: { id: noteId, userId } });
     if (!existingNote) {
-      return res.status(404).json({ error: "Note not found or not owned by user" });
+      res.status(404).json({ error: "Note not found or not owned by user" });
+      return;
     }
 
     await prisma.note.delete({ where: { id: noteId } });
-    return res.status(200).json({ message: "Note deleted successfully" });
+     res.status(200).json({ message: "Note deleted successfully" });
+     return;
   } catch (error) {
     console.error("Error while deleting note:", error);
-    return res.status(500).json({ error: "Internal Server Error" });
+     res.status(500).json({ error: "Internal Server Error" });
+     return;
   }
 };
 

@@ -50,10 +50,11 @@ class AuthService {
         },
       });
       if (isExist) {
+        console.log("user already exist")
         return res.status(406).json({
           error: "Email is already exist",
         });
-      }
+      } 
       const hashedPassword: string = await this.getHashedPassword(
         validatedData.data.password
       );
