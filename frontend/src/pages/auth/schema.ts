@@ -14,8 +14,8 @@ export const signupSchema=z.object({
         message:'Name must be at most 30 character'
     }),
     password:z.string().trim().min(8,{
-        message:"Be atleast 8 character long"
+        message:"Password must be at least 8 characters"
     }).max(100,{
-       message:"Password must be atleast 100 character long"
+       message:"Password can’t be longer than 100 characters"
     })
 })

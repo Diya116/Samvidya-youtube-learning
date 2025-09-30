@@ -81,8 +81,8 @@ const NotesTabContent: React.FC<NotesTabContentProps> = ({
       ) : (
         // Notes list
         <>
-          <div className="p-4 border-b bg-card">
-            <div className="flex items-center justify-between mb-3">
+          <div className="px-4 py-2 bg-card">
+            <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold">Notes</h3>
               <Button
                 onClick={onNewNote}
@@ -90,11 +90,11 @@ const NotesTabContent: React.FC<NotesTabContentProps> = ({
                 className="flex items-center gap-2 cursor-pointer"
               >
                 <Plus className="h-4 w-4" />
-                New
+                New Note
               </Button>
             </div>
           </div>
-          <div className="flex-1 overflow-auto">
+          <div className="flex-1 ">
             {course && (
               <NotesList
                 courseId={course.id}

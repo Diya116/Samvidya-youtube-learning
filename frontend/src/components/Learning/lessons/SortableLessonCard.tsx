@@ -71,14 +71,14 @@ export const SortableLessonCard = ({
             />
           </div>
 
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 overflow-hidden">
             <div className="flex items-center gap-2 mb-1">
               <Badge variant="default">Lesson {lesson.order}</Badge>
               {lesson.duration && (
                 <Badge variant="outline">{lesson.duration}</Badge>
               )}
             </div>
-            <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate">
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white truncate ">
               {lesson.title}
             </h4>
           </div>

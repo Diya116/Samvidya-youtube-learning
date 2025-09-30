@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { EditorContent } from "@tiptap/react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { api } from "@/utils/axiosInstance";
 import type { NoteTakingProps, SaveStatus } from "@/types/Note";
 import { COMMANDS } from "@/constant/editor-commands";
@@ -20,9 +21,15 @@ function NoteTaking({
   setIsNotesOpen,
   isMobile,
   isFullScreen,
-  onToggleFullScreen
-}: NoteTakingProps) {
+  onToggleFullScreen,
+  isStandalone = false // New prop to determine if it's standalone page
+}: NoteTakingProps & { isStandalone?: boolean }) {
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('saved');
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // Check if we're on a standalone note page
+  const isStandaloneMode = isStandalone || location.pathname.includes('/note/');
 
   // Custom hooks
   const slashMenuHandlers = useSlashMenu(COMMANDS);
@@ -82,26 +89,44 @@ function NoteTaking({
   };
 
   const handleClose = () => {
-    if(setIsNotesOpen) setIsNotesOpen(false);
+    if (isStandaloneMode) {
+      // Go back to previous page or notes list
+      navigate(-1);
+    } else {
+      // Close notes panel in learning page
+      if (setIsNotesOpen) setIsNotesOpen(false);
+    }
   };
 
   const handleCommandSelect = (command: any) => {
     executeCommand(command);
   };
 
+  // Determine container height based on mode
+  const containerClass = isStandaloneMode 
+    ? "h-screen flex flex-col dark:bg-gray-800" 
+    : "h-full flex flex-col dark:bg-gray-800";
+
+  // Determine editor container height based on mode
+  const editorContainerClass = isStandaloneMode
+    ? "flex-1 relative editor-container bg-white dark:bg-gray-900 overflow-hidden"
+    : "flex-1 relative editor-container bg-white dark:bg-gray-900 overflow-hidden";
+
   return (
-    <div className="h-full flex flex-col dark:bg-gray-800">
+    <div className={containerClass}>
       <NoteHeader
         title={note.title}
         onTitleChange={handleTitleChange}
         saveStatus={saveStatus}
         onClose={handleClose}
-        isMobile={isMobile??false}
-        isFullScreen={isFullScreen??true}
+        isMobile={isMobile ?? false}
+        isFullScreen={isFullScreen ?? true}
         onToggleFullScreen={onToggleFullScreen}
+        isStandalone={isStandaloneMode}
+        showClose={!isStandaloneMode} // Only show close button in learning page mode
       />
 
-      <div className="flex-1 relative editor-container bg-white dark:bg-gray-900 overflow-hidden">
+      <div className={editorContainerClass}>
         <div className="h-full overflow-y-auto">
           <div className="relative">
             <EditorPlaceholder 

@@ -3,15 +3,23 @@ import { useAuth } from "@/context/AuthContext";
 import { User, Moon, Sun, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 function Setting() {
   const { theme, toggleTheme } = useTheme();
   const { logout } = useAuth();
 
   const handleLogout = () => {
-    if (confirm("Are you sure you want to log out?")) {
-      logout();
-    }
+    logout();
   };
 
   return (
@@ -40,15 +48,15 @@ function Setting() {
               className="flex items-center gap-2"
             >
               {theme === "light" ? (
-                <>
-                  <Sun className="h-4 w-4" />
-                  <span>Light</span>
-                </>
-              ) : (
-                <>
+                <div className="cursor-pointer flex gap-2 items-center">
                   <Moon className="h-4 w-4" />
                   <span>Dark</span>
-                </>
+                </div>
+              ) : (
+                <div className="cursor-pointer flex gap-2 items-center">
+                  <Sun className="h-4 w-4" />
+                  <span>Light</span>
+                </div>
               )}
             </Button>
           </div>
@@ -61,13 +69,28 @@ function Setting() {
           <CardTitle className="text-lg">Account</CardTitle>
         </CardHeader>
         <CardContent>
-          <Button
-            className="w-full flex items-center justify-center gap-2 "
-            onClick={handleLogout}
-          >
-            <LogOut className="h-4 w-4" />
-            <span>Log Out</span>
-          </Button>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button className="text-white w-full flex items-center justify-center gap-2  cursor-pointer">
+                <LogOut className="h-4 w-4" />
+                <span>Log Out</span>
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Confirm Logout</AlertDialogTitle>
+                <AlertDialogDescription>
+                  Are you sure you want to log out?
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction onClick={handleLogout} className="cursor-pointer">
+                  Yes, log out
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
