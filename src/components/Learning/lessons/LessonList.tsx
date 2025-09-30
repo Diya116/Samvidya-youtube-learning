@@ -92,7 +92,9 @@ const LessonList: React.FC<{
           <SortableContext
             items={items.map((l) => l.id)}
             strategy={verticalListSortingStrategy}
+            
           >
+            <div className="flex flex-col gap-2">
             {items
               .sort((a, b) => (a.order ?? 0) - (b.order ?? 0))
               .map((lesson, index) => (
@@ -106,6 +108,7 @@ const LessonList: React.FC<{
                   handleUpdateStatusOfLesson={handleUpdateStatusOfLesson}
                 />
               ))}
+              </div>
           </SortableContext>
         </DndContext>
       </div>

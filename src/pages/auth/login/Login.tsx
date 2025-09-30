@@ -71,12 +71,27 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       //   return;
       // }
       toast.success("Login successful");
-      navigate("/workspace");  
+      navigate("/workspace/courses");  
 
-    } catch (error) {
+    } catch (error:any) {
       setIsLoading(false);
       console.error("Error during login:", error);
-      alert("An error occurred during login. Please try again later.");
+         if (error.response?.status === 401) {
+      const errorMessage = "User not Registered";
+      // setError(errorMessage);
+      toast.error(errorMessage);
+      
+      // Optional: Show login suggestion or redirect
+      // setTimeout(() => navigate("/login"), 2000);
+    } else {
+      // Handle other errors generically
+      const errorMessage = error.response?.data?.message || 
+                          error.response?.data?.error || 
+                          "An error occurred during signup. Please try again.";
+      // setError(errorMessage);
+      toast.error(errorMessage);
+    }
+      // toast.error("An error occurred during login. Please try again later.");
     }
   };
    const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
@@ -86,7 +101,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
   };
   //const {isAuthenticated}=useAuth();
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4">
+    <div className="min-h-screen bg-background flex items-center justify-center p-4">
 {/* {
   isAuthenticated() && (
    <Navigate to="/workspace" replace />
@@ -123,7 +138,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
               </div>
 
               <div>
-                <Label htmlFor="password" className="mb-2">Password</Label>
+                <Label htmlFor="password" className="mb-2">Password<span className="text-red-600">*</span></Label>
                 <Input
                   id="password"
                   name="password"
@@ -137,7 +152,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 
               <Button
                 type="button"
-                className="w-full cursor-pointer"
+                className="w-full cursor-pointer text-foreground"
                 disabled={isLoading}
                 onClick={handleSubmit}
               >
@@ -150,7 +165,7 @@ const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
                 Don't have an account?{" "}
                 <button
                   onClick={() => navigate("/auth/signup")}
-                  className="text-black hover:underline font-medium dark:text-white cursor-pointer"
+                  className="text-foreground hover:underline font-medium cursor-pointer"
                   type="button"
                 >
                   Sign up
