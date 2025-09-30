@@ -48,7 +48,7 @@ const TabContentRenderer: React.FC<TabContentRendererProps> = ({
   switch (activeTab) {
     case "details":
       return (
-        <div className="h-full overflow-auto">
+        <div className="h-full ">
           {course ? (
             <LessonDescription
               lessons={course.lessons}

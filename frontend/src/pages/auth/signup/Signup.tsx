@@ -2,14 +2,14 @@ import { useState, useEffect } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-//schema and type
+// Schema and type
 import { signupSchema } from "../schema";
 import type { SignupForm } from "@/types/auth";
 
-//API service
-//import { signupUserapi } from "@/services/authService";
+// API service
 import { useAuth } from "@/context/AuthContext";
-//UI COMPONENTS
+
+// UI COMPONENTS
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +19,8 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 
 const Signup = () => {
   const navigate = useNavigate();
-  const { signup } = useAuth();
+  const { signup, isAuthenticated } = useAuth();
+  
   const [formData, setFormData] = useState<SignupForm>({
     name: "",
     email: "",
@@ -46,43 +47,58 @@ const Signup = () => {
   };
 
   const handleSubmit = async (): Promise<void> => {
-    //1)email and password both required
+    // 1) Check if all fields are filled
     if (
       formData.name.trim() === "" ||
       formData.email.trim() === "" ||
       formData.password.trim() === ""
     ) {
-      setError("name,Email,password both required");
+      setError("Name, email, and password are required");
       return;
     }
-    //2)validate data using zod schema
+    
+    // 2) Validate data using zod schema
     const validateData = signupSchema.safeParse(formData);
     if (!validateData.success) {
       setError(validateData.error.errors[0].message);
       return;
     }
+    
     try {
       setIsLoading(true);
-      // const response = await signupUserapi(formData);
+      setError("");
+      
+      // Context signup now throws on failure
       await signup(formData);
-      setIsLoading(false);
-      // if (!response.success) {
-      //   setError(response.error);
-      //   return;
-      // }
+      
       toast.success("Signup successful");
       navigate("/workspace/courses");
-    } catch (error) {
-      console.error("Error during login:", error);
-      alert("An error occurred during login. Please try again later.");
+      
+    } catch (error: any) {
+      console.error("Error during signup:", error);
+      
+      // Error message comes from AuthContext/authService
+      const errorMessage = error.message || "An error occurred during signup. Please try again.";
+      setError(errorMessage);
+      toast.error(errorMessage);
+      
+      // If email already registered, suggest login
+      if (errorMessage.includes("already registered")) {
+        setTimeout(() => {
+          navigate("/auth/login");
+        }, 2000);
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
+
   const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>): void => {
     if (e.key === "Enter") {
       handleSubmit();
     }
   };
-  const { isAuthenticated } = useAuth();
+
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
       {isAuthenticated() && <Navigate to="/workspace/courses" replace />}
@@ -103,13 +119,13 @@ const Signup = () => {
 
             <div className="space-y-4">
               <div>
-                <Label htmlFor="email" className="mb-2">
-                  name <span className="text-red-600">*</span>
+                <Label htmlFor="name" className="mb-2">
+                  Name <span className="text-red-600">*</span>
                 </Label>
                 <Input
                   id="name"
                   name="name"
-                  type="name"
+                  type="text"
                   placeholder="Enter your name"
                   value={formData.name}
                   onChange={handleChange}
@@ -132,7 +148,7 @@ const Signup = () => {
 
               <div>
                 <Label htmlFor="password" className="mb-2">
-                  Password
+                  Password <span className="text-red-600">*</span>
                 </Label>
                 <Input
                   id="password"
@@ -147,11 +163,11 @@ const Signup = () => {
 
               <Button
                 type="button"
-                className="w-full text-white"
+                className="w-full text-white cursor-pointer"
                 disabled={isLoading}
                 onClick={handleSubmit}
               >
-                {isLoading ? "Signing in..." : "Sign Up"}
+                {isLoading ? "Signing up..." : "Sign Up"}
               </Button>
             </div>
 
@@ -160,7 +176,7 @@ const Signup = () => {
                 Already have account?{" "}
                 <button
                   onClick={() => navigate("/auth/login")}
-                  className="text-black hover:underline font-medium dark:text-white"
+                  className="text-foreground cursor-pointer hover:underline font-medium dark:text-white"
                   type="button"
                 >
                   Log in

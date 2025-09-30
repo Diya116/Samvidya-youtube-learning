@@ -52,11 +52,11 @@ const SortableLessonCard = ({  lesson, onEdit, onDelete }: any) => {
               )}
             </div>
             <div className="flex gap-4">
-              <div>
-                <img src={lesson.thumbnail} className="w-32 h-full" />
+              <div className="flex-shrink-0 w-20 h-20  rounded bg-gray-100 dark:bg-gray-700">
+                <img src={lesson.thumbnail} className="w-full h-full object-cover" alt="lesson thumbnail" />
               </div>
               <div>
-                <h4 className="font-medium text-gray-900 mb-1 dark:text-white">
+                <h4 className="text-smfont-medium text-gray-900 mb-1 dark:text-white ">
                   {lesson.title}
                 </h4>
               </div>
@@ -122,10 +122,11 @@ export const LessonList: React.FC<{
   }
 
   return (
-    <div className="space-y-3">
+    <div className="space-y-3 h-full max-h-[calc(100vh-100px]]])] overflow-hidden flex flex-col">
       <h3 className="font-semibold text-lg">
         Course Lessons ({lessons.length})
       </h3>
+      <div className="overflow-y-auto flex-1">
       <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
         <SortableContext items={items.map(l=>l.id)} strategy={verticalListSortingStrategy}>
  {lessons.map((lesson, index) => (
@@ -133,6 +134,7 @@ export const LessonList: React.FC<{
       ))}
         </SortableContext>
       </DndContext>
+      </div>
      
     </div>
   );

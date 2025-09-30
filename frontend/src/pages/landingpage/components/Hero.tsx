@@ -25,14 +25,14 @@ const Hero = () => {
             <div className="flex flex-col sm:flex-row gap-4">
               <Button
                 className="bg-[#0075de] text-white cursor-pointer hover:bg-[#0075de]"
-                onClick={() => navigate("/auth/login")}
+                onClick={() => navigate("/auth/signup")}
               >
                 Start Learning Free
                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
               </Button>
             </div>
 
-            <div className="flex items-center space-x-6 text-sm text-muted-foreground">
+            {/* <div className="flex items-center space-x-6 text-sm text-muted-foreground">
               <span className="flex items-center space-x-2">
                 <div className="w-2 h-2 bg-[#0075de] rounded-full"></div>
                 <span>Free forever</span>
@@ -45,7 +45,7 @@ const Hero = () => {
                 <div className="w-2 h-2 bg-[#0075de] rounded-full"></div>
                 <span>Open source</span>
               </span>
-            </div>
+            </div> */}
           </div>
 
           <div className="relative">
