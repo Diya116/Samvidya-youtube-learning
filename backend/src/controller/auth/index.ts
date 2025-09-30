@@ -12,17 +12,27 @@ class AuthController{
         return AuthController.instance;
     }
 
-    public register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-        try {
-            await authService.register(req, res, next);
-        } catch (error) {
-            console.error(error);
-            if (!res.headersSent) {
-                res.status(500).json({ error: "Something went wrong!" });
-            }
+    // public register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    //     try {
+    //         await authService.register(req, res, next);
+    //     } catch (error) {
+    //         console.error(error);
+    //         if (!res.headersSent) {
+    //             res.status(500).json({ error: "Something went wrong!" });
+    //         }
+    //     }
+    // };
+public register = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        await authService.register(req, res, next);
+    } catch (error) {
+        // Only handle if response hasn't been sent yet
+        if (!res.headersSent) {
+            console.error("Unexpected error in register controller:", error);
+            res.status(500).json({ error: "Something went wrong!" });
         }
-    };
-
+    }
+};
     public login=async(req:Request,res:Response):Promise<void>=>{
         try{
   await authService.login(req,res);
