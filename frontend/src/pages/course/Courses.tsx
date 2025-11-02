@@ -27,10 +27,16 @@ function Courses() {
     }
   }, [courses, searchQuery]);
 
-  const handleCourseSubmit = (course: Course) => {
-    if (isEdit) updateCourse.mutate(course);
-    else addCourse.mutate(course);
-    setIsOpen(false);
+  const handleCourseSubmit = async (course: Course) => {
+    if (isEdit) {
+      updateCourse.mutate(course, {
+        onSuccess: () => setIsOpen(false)
+      });
+    } else {
+      addCourse.mutate(course, {
+        onSuccess: () => setIsOpen(false)
+      });
+    }
   };
 
   const handleCourseDelete = (id: string) => {
